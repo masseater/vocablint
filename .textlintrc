@@ -1,0 +1,24 @@
+{
+  "rules": {
+    "@textlint-ja/preset-ai-writing": true,
+    "preset-ja-technical-writing": {
+      "sentence-length": { "max": 120 },
+      "ja-no-mixed-period": { "allowPeriodMarks": [":"] },
+      "no-mix-dearu-desumasu": { "preferInBody": "である", "preferInList": "である" },
+      "max-kanji-continuous-len": {
+        "max": 6,
+        "allow": [
+          "外国電子決済手段",
+          "電子決済手段等取引業",
+          "前払式支払手段",
+          "犯罪収益移転防止法",
+          "事業者間取引適正化等法",
+          "個人情報保護法",
+          "特定商取引法",
+          "電気通信利用役務",
+          "特定業務委託事業者"
+        ]
+      }
+    }
+  }
+}

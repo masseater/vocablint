@@ -1,0 +1,19 @@
+{
+  "name": "claude-harness",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "fallow": "fallow --skip dupes --quiet --format compact && fallow dupes --quiet --format compact && fallow security --fail-on-issues --quiet"
+  },
+  "dependencies": {
+    "@distilled.cloud/cloudflare": "catalog:stack",
+    "@effect/platform-node": "catalog:",
+    "@yarnpkg/parsers": "catalog:",
+    "alchemy": "catalog:stack",
+    "effect": "catalog:stack"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "fallow": {
+      "type": "stdio",
+      "command": "vp",
+      "args": ["exec", "fallow-mcp"]
+    },
+    "cloudflare-api": {
+      "type": "http",
+      "url": "https://mcp.cloudflare.com/mcp",
+      "headersHelper": "node .claude/hooks/cloudflare-mcp-headers.ts"
+    },
+    "cloudflare-observability": {
+      "type": "http",
+      "url": "https://observability.mcp.cloudflare.com/mcp",
+      "headersHelper": "node .claude/hooks/cloudflare-mcp-headers.ts"
+    }
+  }
+}

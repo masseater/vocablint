@@ -1,0 +1,11 @@
+id: exclusive-status
+languages: [TypeScript, Tsx]
+kind: noul
+rule: { kind: program }
+subject: file
+state: bare
+ask: This code represents one piece of state with several boolean flags or optional fields that can contradict each other, instead of one exclusive status expressed as a discriminated union.
+criteria:
+  "true": A state is split into flags or optional fields whose combinations can contradict each other.
+  "false": Every state is a single exclusive status, or the file holds no such state.
+severity: error

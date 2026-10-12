@@ -1,0 +1,13 @@
+id: server-state-tanstack-query
+languages: [TypeScript, Tsx]
+kind: noul
+rule: { kind: program }
+subject: file
+state: bare
+ask: This code fetches, caches or synchronizes server data on the client with something other than TanStack Query, such as fetch inside useEffect, SWR or a hand-written cache.
+criteria:
+  "true": Server data is fetched, cached or synchronized on the client without TanStack Query.
+  "false":
+    what: Server data on the client goes only through TanStack Query, or the file handles none.
+    not_for: Creating an API client such as a better-auth or Eden client, which fetches nothing until a query calls it.
+severity: error

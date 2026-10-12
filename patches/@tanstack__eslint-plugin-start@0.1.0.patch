@@ -1,0 +1,70 @@
+diff --git a/dist/cjs/rules/no-async-client-component/no-async-client-component.rule.cjs b/dist/cjs/rules/no-async-client-component/no-async-client-component.rule.cjs
+index 4aaf56f08413b6f8d55d2fa5b6f624a68b39598f..6b21db5064ea123535ca71a1b1ec28230f965a97 100644
+--- a/dist/cjs/rules/no-async-client-component/no-async-client-component.rule.cjs
++++ b/dist/cjs/rules/no-async-client-component/no-async-client-component.rule.cjs
+@@ -52,7 +52,7 @@ var rule = _typescript_eslint_utils.ESLintUtils.RuleCreator(require_get_docs_url
+ 		const reported = /* @__PURE__ */ new Set();
+ 		return { Program() {
+ 			const sourceFile = program.getSourceFile(currentFile);
+-			if (!sourceFile || !fileContainsRouteOptions(sourceFile) && !fileContainsServerComponentRoots(sourceFile) && !fileHasUseClientDirective(sourceFile)) return;
++			if (!sourceFile) return;
+ 			if (fileContainsRouteOptions(sourceFile)) {}
+ 			const analysis = getOnDemandAnalysis(currentFile);
+ 			for (const [key, ctx] of analysis.contexts) {
+@@ -130,7 +130,7 @@ var rule = _typescript_eslint_utils.ESLintUtils.RuleCreator(require_get_docs_url
+ 			const full = cached.builder.getGraph();
+ 			const subgraph = sliceGraphForEntryFile(full, entryFile);
+ 			const entrySourceFile = program.getSourceFile(entryFile);
+-			const analysis = !!entrySourceFile && fileContainsRouteOptions(entrySourceFile) && subgraph.clientRoots.size === 0 && subgraph.serverRoots.size === 0 ? require_context_analyzer.analyzeContext(full) : require_context_analyzer.analyzeContext(subgraph);
++			const analysis = !!entrySourceFile && subgraph.clientRoots.size === 0 && subgraph.serverRoots.size === 0 ? require_context_analyzer.analyzeContext(full) : require_context_analyzer.analyzeContext(subgraph);
+ 			programCache.set(entryFile, {
+ 				graph: subgraph,
+ 				analysis
+diff --git a/dist/cjs/rules/no-client-code-in-server-component/no-client-code-in-server-component.rule.cjs b/dist/cjs/rules/no-client-code-in-server-component/no-client-code-in-server-component.rule.cjs
+index e2c841a87513d7df31adbf2bc6bb0c0cc5a066b9..45499c4cfcf02c39f3c784c70d286cc269d345cc 100644
+--- a/dist/cjs/rules/no-client-code-in-server-component/no-client-code-in-server-component.rule.cjs
++++ b/dist/cjs/rules/no-client-code-in-server-component/no-client-code-in-server-component.rule.cjs
+@@ -206,7 +206,7 @@ var rule = _typescript_eslint_utils.ESLintUtils.RuleCreator(require_get_docs_url
+ 				}
+ 				typescript.forEachChild(n, visit);
+ 			}
+-			typescript.forEachChild(node, visit);
++			visit(node);
+ 			return refs;
+ 		}
+ 		function reportViolation(violation, chain, entryComponentName, eslintNode) {
+diff --git a/dist/esm/rules/no-async-client-component/no-async-client-component.rule.js b/dist/esm/rules/no-async-client-component/no-async-client-component.rule.js
+index b85f9ec983f96d7ac8c29922a73a82848a9d506a..69d381b8943d7c60341988aa2645a2b27206e100 100644
+--- a/dist/esm/rules/no-async-client-component/no-async-client-component.rule.js
++++ b/dist/esm/rules/no-async-client-component/no-async-client-component.rule.js
+@@ -49,7 +49,7 @@ var rule = ESLintUtils.RuleCreator(getDocsUrl)({
+ 		const reported = /* @__PURE__ */ new Set();
+ 		return { Program() {
+ 			const sourceFile = program.getSourceFile(currentFile);
+-			if (!sourceFile || !fileContainsRouteOptions(sourceFile) && !fileContainsServerComponentRoots(sourceFile) && !fileHasUseClientDirective(sourceFile)) return;
++			if (!sourceFile) return;
+ 			if (fileContainsRouteOptions(sourceFile)) {}
+ 			const analysis = getOnDemandAnalysis(currentFile);
+ 			for (const [key, ctx] of analysis.contexts) {
+@@ -127,7 +127,7 @@ var rule = ESLintUtils.RuleCreator(getDocsUrl)({
+ 			const full = cached.builder.getGraph();
+ 			const subgraph = sliceGraphForEntryFile(full, entryFile);
+ 			const entrySourceFile = program.getSourceFile(entryFile);
+-			const analysis = !!entrySourceFile && fileContainsRouteOptions(entrySourceFile) && subgraph.clientRoots.size === 0 && subgraph.serverRoots.size === 0 ? analyzeContext(full) : analyzeContext(subgraph);
++			const analysis = !!entrySourceFile && subgraph.clientRoots.size === 0 && subgraph.serverRoots.size === 0 ? analyzeContext(full) : analyzeContext(subgraph);
+ 			programCache.set(entryFile, {
+ 				graph: subgraph,
+ 				analysis
+diff --git a/dist/esm/rules/no-client-code-in-server-component/no-client-code-in-server-component.rule.js b/dist/esm/rules/no-client-code-in-server-component/no-client-code-in-server-component.rule.js
+index b5904992b89d6c2b30096793e5c8818e37045644..9823c149647255906e68bda2d7906c587b0bf236 100644
+--- a/dist/esm/rules/no-client-code-in-server-component/no-client-code-in-server-component.rule.js
++++ b/dist/esm/rules/no-client-code-in-server-component/no-client-code-in-server-component.rule.js
+@@ -203,7 +203,7 @@ var rule = ESLintUtils.RuleCreator(getDocsUrl)({
+ 				}
+ 				ts.forEachChild(n, visit);
+ 			}
+-			ts.forEachChild(node, visit);
++			visit(node);
+ 			return refs;
+ 		}
+ 		function reportViolation(violation, chain, entryComponentName, eslintNode) {

@@ -1,0 +1,2 @@
+vp run verify
+vp run jev-lint

@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "CLAUDE_CODE_ENABLE_FUNCTION_HOOKS": "1"
+  },
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  },
+  "permissions": {
+    "deny": ["Bash(pnpm *)", "Bash(pnpx *)", "Bash(pn *)", "Bash(pnx *)"]
+  },
+  "enabledMcpjsonServers": ["fallow"],
+  "extraKnownMarketplaces": {
+    "jev-lint": {
+      "source": {
+        "source": "github",
+        "repo": "mizchi/jev-lint"
+      }
+    },
+    "cc-jev-teacher": {
+      "source": {
+        "source": "github",
+        "repo": "masseater/cc-jev-teacher"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "jev-lint@jev-lint": true,
+    "cc-jev-teacher@cc-jev-teacher": true
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/block-pnpm.ts"],
+            "timeout": 10,
+            "statusMessage": "pnpm の直接実行を確認中"
+          },
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/fallow-gate.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PROJECT_DIR}/.intent/hooks/intent-claude-gate.mjs"],
+            "timeout": 10,
+            "statusMessage": "Checking Intent guidance"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-start.sh",
+            "timeout": 600,
+            "statusMessage": "依存関係をインストール中"
+          }
+        ]
+      },
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PROJECT_DIR}/.intent/hooks/intent-claude-gate.mjs"],
+            "timeout": 10,
+            "statusMessage": "Loading Intent skill catalog"
+          }
+        ]
+      },
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["--use-env-proxy", "${CLAUDE_PROJECT_DIR}/.claude/hooks/template-release.ts"],
+            "timeout": 10,
+            "statusMessage": "テンプレートの新しいリリースを確認中"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": [
+              "--env-file-if-exists=${CLAUDE_PROJECT_DIR}/.env",
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/post-edit.ts"
+            ],
+            "timeout": 300,
+            "statusMessage": "fallow で変更を検査中"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(git commit *)",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/simplify.sh",
+            "asyncRewake": true,
+            "timeout": 3600
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": [
+              "--env-file-if-exists=${CLAUDE_PROJECT_DIR}/.env",
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/stop-gate.ts"
+            ],
+            "timeout": 1800,
+            "statusMessage": "vp run verify を実行中"
+          },
+          {
+            "type": "agent",
+            "prompt": "別の目でこのリポジトリの変更を審査する。検査や lint や型の設定、ルール、閾値、抑制コメント、無視パターンが、正当な理由なく無効化・簡易化・緩和されていないかを判断する。\n\n判定材料は `git status`・`git diff HEAD`・`git log main..HEAD -p` と、変更されたファイルおよび設定ファイルである。問題がなければ ok を true にする。問題があれば ok を false にし、reason に何が問題でどう直すべきかを具体的に書く。\n\n$ARGUMENTS",
+            "timeout": 600
+          },
+          {
+            "type": "agent",
+            "prompt": "別の目でこのリポジトリの変更を審査する。自作のコードや仕組みが本当に最終手段かを判断する。CLAUDE.md の最上位原則に照らし、公式の統合手段、既存のライブラリ、ブログや issue の方針を本当に探したうえでの自作かを確かめる。必要なら自分でも探す。\n\n判定材料は `git status`・`git diff HEAD`・`git log main..HEAD -p` と、変更されたファイルおよび設定ファイルである。問題がなければ ok を true にする。問題があれば ok を false にし、reason に何が問題でどう直すべきかを具体的に書く。\n\n$ARGUMENTS",
+            "timeout": 600
+          },
+          {
+            "type": "agent",
+            "prompt": "別の目でこのリポジトリの変更を審査する。Feature-Sliced Design のスライスの中まで読み、コロケーションが守られているかを判断する。使われる場所の近くに置かれているか、早すぎる切り出しや不自然な分割がないかを見る。\n\n判定材料は `git status`・`git diff HEAD`・`git log main..HEAD -p` と、変更されたファイルおよび設定ファイルである。問題がなければ ok を true にする。問題があれば ok を false にし、reason に何が問題でどう直すべきかを具体的に書く。\n\n$ARGUMENTS",
+            "timeout": 600
+          },
+          {
+            "type": "agent",
+            "prompt": "別の目でこのリポジトリの変更を審査する。HTML・CSS・クライアント側の JavaScript の変更が modern-web-guidance スキルの指針に沿っているかを判断する。スキルの手順で該当するガイドを検索して取得し、古いパターンや不要な依存、Baseline Widely available でない機能の無防備な使用、アクセシビリティの欠落がないかを見る。該当する変更がなければ ok を true にする。\n\n判定材料は `git status`・`git diff HEAD`・`git log main..HEAD -p` と、変更されたファイルおよび設定ファイルである。問題がなければ ok を true にする。問題があれば ok を false にし、reason に何が問題でどう直すべきかを具体的に書く。\n\n$ARGUMENTS",
+            "timeout": 600
+          }
+        ]
+      }
+    ]
+  }
+}

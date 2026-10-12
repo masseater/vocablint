@@ -1,0 +1,73 @@
+{
+  "name": "typescript-template",
+  "version": "0.0.7",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "markdown-lint": "textlint \"**/*.md\" && git ls-files -co --exclude-standard '*.md' | git -c core.excludesFile=.textlintignore check-ignore --no-index --stdin -nv | awk '$1 == \"::\" { print $2 }' | xargs -r -n 1 -P 4 python3 \"$(skills ls --json | jq -r '.[] | select(.name == \"yomiyasu\").path')/scripts/yomiyasu_lint.py\" --strict",
+    "renovate": "renovate-config-validator --strict",
+    "fallow": "fallow --skip dupes --quiet --format compact && fallow dead-code --no-production --quiet --format compact && fallow dupes --quiet --format compact && fallow security --fail-on-issues --quiet",
+    "prepare": "vp config && skills experimental_install --force"
+  },
+  "devDependencies": {
+    "@ast-grep/cli": "catalog:",
+    "@commitlint/cli": "catalog:",
+    "@commitlint/config-conventional": "catalog:",
+    "@effect/tsgo": "catalog:stack",
+    "@eslint-react/eslint-plugin": "catalog:",
+    "@eslint/config-helpers": "catalog:",
+    "@html-eslint/eslint-plugin-react": "catalog:",
+    "@shadcn/lint": "catalog:",
+    "@tanstack/eslint-plugin-query": "catalog:",
+    "@tanstack/eslint-plugin-router": "catalog:",
+    "@tanstack/eslint-plugin-start": "catalog:",
+    "@tanstack/intent": "catalog:",
+    "@textlint-ja/textlint-rule-preset-ai-writing": "1.7.0",
+    "@types/node": "catalog:",
+    "@typescript-eslint/parser": "catalog:",
+    "eslint": "catalog:",
+    "eslint-plugin-baseline-js": "catalog:",
+    "eslint-plugin-drizzle": "catalog:",
+    "eslint-plugin-no-comments": "catalog:",
+    "eslint-plugin-react-hooks": "catalog:",
+    "fallow": "catalog:stack",
+    "jev-lint": "catalog:",
+    "renovate": "catalog:stack",
+    "skills": "catalog:",
+    "syncpack": "catalog:",
+    "textlint": "catalog:stack",
+    "textlint-rule-preset-ja-technical-writing": "12.0.2",
+    "vite-plus": "catalog:stack"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.10.1",
+      "onFail": "download"
+    }
+  },
+  "engines": {
+    "node": ">=26.0.0"
+  },
+  "intent": {
+    "skills": [
+      "@tanstack/devtools-vite",
+      "@tanstack/react-start",
+      "drizzle-kit",
+      "@tanstack/devtools",
+      "@tanstack/devtools-event-client",
+      "@tanstack/match-sorter-utils",
+      "@tanstack/router-core",
+      "@tanstack/start-client-core",
+      "@tanstack/virtual-file-routes",
+      "@tanstack/router-plugin",
+      "@tanstack/start-server-core",
+      "fallow"
+    ]
+  }
+}

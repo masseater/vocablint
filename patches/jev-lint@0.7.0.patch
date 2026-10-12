@@ -1,0 +1,95 @@
+diff --git a/dist/jev.js b/dist/jev.js
+index 230004c68716bd36e5b48e303548af1da303c32b..9d880349f5222338071d24af87cc68aab8c76a63 100644
+--- a/dist/jev.js
++++ b/dist/jev.js
+@@ -43,6 +43,53 @@ export function fromEnv(names, env = process.env) {
+ }
+ /** Published input price, USD per million input tokens. Output is not billed. */
+ export const USD_PER_MTOK = 0.042;
++/**
++ * Respan models on OpenRouter take the state as text and only noul questions
++ * whose instructions and criteria are plain strings.
++ */
++function isRespan(model) {
++    return String(model).startsWith("respan/");
++}
++const asText = (value) => (typeof value === "string" ? value : JSON.stringify(value));
++export function wireState(model, state) {
++    if (!isRespan(model) || !state || typeof state !== "object")
++        return state;
++    return Object.entries(state)
++        .map(([key, value]) => `## ${key}\n${asText(value)}`)
++        .join("\n\n");
++}
++export function wireQuestions(model, questions) {
++    if (!isRespan(model))
++        return questions;
++    return Object.fromEntries(Object.entries(questions).map(([id, q]) => {
++        if (q.type !== "noul") {
++            throw new JevError(`${model} answers only noul questions, and ${id} is ${q.type}: judge this rule with another model`, { kind: "auth" });
++        }
++        return [id, {
++                ...q,
++                instructions: typeof q.instructions === "string"
++                    ? q.instructions
++                    : Object.entries(q.instructions).map(([key, value]) => `${key}: ${asText(value)}`).join("\n"),
++                ...(q.criteria ? { criteria: Object.fromEntries(Object.entries(q.criteria).map(([key, value]) => [key, asText(value)])) } : {}),
++            }];
++    }));
++}
++/**
++ * What OpenRouter records on each generation to tell the sender apart: the
++ * app (referer and title), `user` as `<place>:<project>:jev-lint <command>`
++ * and the Claude Code session or the Actions run as `session_id`.
++ */
++export function attribution(baseUrl, env = process.env) {
++    if (!String(baseUrl).includes("openrouter.ai"))
++        return { headers: {}, body: {} };
++    const place = env.GITHUB_ACTIONS === "true" ? "ci" : env.CLAUDE_CODE_REMOTE === "true" ? "cloud" : "local";
++    const project = process.cwd().split(/[\\/]/).filter(Boolean).at(-1) ?? "";
++    const session = env.CLAUDE_CODE_SESSION_ID || env.GITHUB_RUN_ID || "";
++    return {
++        headers: { "HTTP-Referer": "https://github.com/mizchi/jev-lint", "X-OpenRouter-Title": "jev-lint" },
++        body: { user: `${place}:${project}:jev-lint ${process.argv[2] ?? ""}`.trim(), ...(session ? { session_id: session } : {}) },
++    };
++}
+ export class JevError extends Error {
+     status;
+     kind;
+@@ -259,7 +306,8 @@ export class Jev {
+         };
+     }
+     get usd() {
+-        return (this.inputTokens / 1_000_000) * USD_PER_MTOK;
++        // OpenRouter answers with what it billed; TypeSafe does not, so its price is estimated.
++        return this.billedUsd ?? (this.inputTokens / 1_000_000) * USD_PER_MTOK;
+     }
+     /** One request: one state, N questions, N answers. */
+     async ask(state, questions) {
+@@ -269,7 +317,8 @@ export class Jev {
+         const names = Object.keys(questions);
+         if (names.length === 0)
+             return { answers: {}, usage: { input_tokens: 0 } };
+-        const body = JSON.stringify({ model: this.model, state, questions });
++        const sent = attribution(this.baseUrl);
++        const body = JSON.stringify({ ...sent.body, model: this.model, state: wireState(this.model, state), questions: wireQuestions(this.model, questions) });
+         if (this.onRequest)
+             this.onRequest(body);
+         let last = new JevError("no attempt made");
+@@ -290,6 +339,7 @@ export class Jev {
+                 res = await this.transport(`${this.baseUrl}/v1/systemone`, {
+                     method: "POST",
+                     headers: {
++                        ...sent.headers,
+                         authorization: `Bearer ${this.apiKey}`,
+                         "content-type": "application/json",
+                     },
+@@ -317,6 +367,8 @@ export class Jev {
+                 this.totalMs += Date.now() - started;
+                 this.inputTokens += parsed.usage?.input_tokens ?? 0;
+                 this.outputTokens += parsed.usage?.output_tokens ?? 0;
++                if (typeof parsed.usage?.cost === "number")
++                    this.billedUsd = (this.billedUsd ?? 0) + parsed.usage.cost;
+                 if (parsed.model)
+                     this.servedModel = parsed.model;
+                 return parsed;

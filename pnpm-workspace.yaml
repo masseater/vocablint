@@ -1,0 +1,88 @@
+packages:
+  - apps/*
+  - libs/*
+  - infra/*
+  - tools/*
+  - .claude
+
+catalogMode: prefer
+
+catalog:
+  "@ast-grep/cli": 0.45.3
+  "@cloudflare/workers-types": 5.20261009.1
+  "@effect/platform-node": 4.0.0
+  "@eslint-react/eslint-plugin": 5.24.9
+  "@shadcn/lint": 0.2.0
+  "@tanstack/eslint-plugin-query": 5.104.1
+  "@tanstack/eslint-plugin-router": 1.162.0
+  "@tanstack/eslint-plugin-start": 0.1.0
+  "@typescript-eslint/parser": 8.71.1
+  "@types/node": 26.6.4
+  eslint: 10.12.0
+  eslint-plugin-drizzle: 0.2.3
+  eslint-plugin-react-hooks: 7.1.1
+  syncpack: 15.3.3
+  vite: npm:@voidzero-dev/vite-plus-core@1.1.0
+  jev-lint: 0.7.0
+  "@eslint/config-helpers": 0.7.0
+  eslint-plugin-no-comments: 1.2.1
+  eslint-plugin-baseline-js: 0.7.4
+  "@html-eslint/eslint-plugin-react": 0.66.1
+  "@commitlint/cli": 21.2.3
+  "@commitlint/config-conventional": 21.2.3
+  "@tanstack/react-query-devtools": 5.104.1
+  "@vitejs/plugin-react": 6.1.2
+  "@vitejs/plugin-rsc": 0.5.36
+  skills: 1.7.1
+  "@tanstack/intent": 0.5.5
+  "@yarnpkg/parsers": 3.1.0
+catalogs:
+  stack:
+    "@distilled.cloud/cloudflare": 1.0.0-rc.13
+    "@effect/atom-react": 4.0.0
+    "@effect/tsgo": 0.50.0
+    "@elysiajs/eden": 1.4.9
+    "@openfeature/server-sdk": 1.23.0
+    "@tanstack/react-query": 5.104.1
+    "@tanstack/react-start": 1.168.60
+    alchemy: 2.0.0-beta.81
+    better-auth: 1.7.7
+    drizzle-kit: 1.0.0-rc.5-5935859
+    drizzle-orm: 1.0.0-rc.5-5935859
+    eden-tanstack-react-query: 0.5.0
+    effect: 4.0.0
+    elysia: 1.4.30
+    fallow: 3.32.0
+    radix-ui: 1.7.0
+    renovate: 44.148.3
+    steiger: 0.7.0
+    tailwindcss: 4.3.3
+    textlint: 15.8.0
+    typescript: 7.0.2
+    vite-plus: 1.1.0
+overrides:
+  effect: "catalog:stack"
+  "@effect/platform-node-shared": 4.0.0
+  "@effect/sql-d1": 4.0.0
+  "@effect/sql-sqlite-do": 4.0.0
+  "@effect/vitest": 4.0.0
+  vite@*: "catalog:"
+  eslint-plugin-react-hooks>zod-validation-error: ^5.0.0
+peerDependencyRules:
+  allowAny:
+    - vite
+allowBuilds:
+  "@ast-grep/cli": true
+  esbuild: true
+  workerd: true
+  protobufjs: false
+  core-js-pure: false
+  dtrace-provider: false
+  re2: true
+packageExtensions:
+  "@feature-sliced/steiger-plugin@0.8.0":
+    dependencies:
+      "@steiger/toolkit": 0.2.3
+patchedDependencies:
+  "@tanstack/eslint-plugin-start@0.1.0": patches/@tanstack__eslint-plugin-start@0.1.0.patch
+  jev-lint@0.7.0: patches/jev-lint@0.7.0.patch
