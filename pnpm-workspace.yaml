@@ -28,7 +28,7 @@ catalog:
   "@html-eslint/eslint-plugin-react": 0.66.1
   "@commitlint/cli": 21.2.3
   "@commitlint/config-conventional": 21.2.3
-  skills: 1.7.1
+  skills: 1.7.2
   "@tanstack/intent": 0.5.5
   "@yarnpkg/parsers": 3.1.0
   vitest: 5.0.3
