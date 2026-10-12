@@ -23,7 +23,7 @@ catalog:
   eslint-plugin-react-hooks: 7.1.1
   syncpack: 15.3.3
   vite: npm:@voidzero-dev/vite-plus-core@1.1.0
-  jev-lint: 0.7.0
+  "@r_masseater/oxlint-plugin-decision": 0.0.4
   "@eslint/config-helpers": 0.7.0
   eslint-plugin-no-comments: 1.2.1
   eslint-plugin-baseline-js: 0.7.4
@@ -37,6 +37,7 @@ catalog:
   "@tanstack/intent": 0.5.5
   "@yarnpkg/parsers": 3.1.0
   vitest: 5.0.3
+  jose: 6.2.12
 catalogs:
   stack:
     "@distilled.cloud/cloudflare": 1.0.0-rc.13
@@ -80,10 +81,12 @@ allowBuilds:
   core-js-pure: false
   dtrace-provider: false
   re2: true
+  "@openrouter/sdk": false
 packageExtensions:
   "@feature-sliced/steiger-plugin@0.8.0":
     dependencies:
       "@steiger/toolkit": 0.2.3
 patchedDependencies:
   "@tanstack/eslint-plugin-start@0.1.0": patches/@tanstack__eslint-plugin-start@0.1.0.patch
-  jev-lint@0.7.0: patches/jev-lint@0.7.0.patch
+minimumReleaseAgeExclude:
+  - "@r_masseater/oxlint-plugin-decision@0.0.4"

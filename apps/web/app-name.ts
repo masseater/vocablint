@@ -5,6 +5,8 @@ const APP_NAME = "typescript-template";
 
 const PREFIX = `${APP_NAME}-`;
 
+const CI_TELEMETRY_AUDIENCE = `${PREFIX}ci-telemetry`;
+
 const decodeNamed = Schema.decodeUnknownOption(Schema.Struct({ name: Schema.String }));
 
 const describeUnprefixed = ({
@@ -33,4 +35,4 @@ const requireAppPrefix = Effect.gen(function* requireAppPrefix() {
   return offenders;
 });
 
-export { APP_NAME, requireAppPrefix };
+export { APP_NAME, CI_TELEMETRY_AUDIENCE, requireAppPrefix };
