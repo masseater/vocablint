@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "fallow": "fallow --skip dupes --quiet --format compact && fallow dupes --quiet --format compact && fallow security --fail-on-issues --quiet"
+    "fallow": "fallow --skip dupes --fail-on-issues --quiet --format compact && fallow dupes --fail-on-issues --quiet --format compact && fallow security --fail-on-issues --quiet"
   },
   "dependencies": {
     "@distilled.cloud/cloudflare": "catalog:stack",

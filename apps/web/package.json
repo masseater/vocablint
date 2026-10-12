@@ -14,7 +14,7 @@
     "db:generate": "drizzle-kit generate",
     "prepare": "effect-tsgo patch --typescript --oxlint",
     "auth:generate": "auth generate --config src/shared/auth/auth.server.ts --output src/shared/auth/generated/auth.table.ts --yes",
-    "fallow": "fallow --skip dupes --quiet --format compact && fallow dupes --quiet --format compact && fallow security --fail-on-issues --quiet",
+    "fallow": "fallow --skip dupes --fail-on-issues --quiet --format compact && fallow dupes --fail-on-issues --quiet --format compact && fallow security --fail-on-issues --quiet",
     "db:check": "drizzle-kit check && drizzle-kit generate --explain --output json | grep -q '\"status\":\"no_changes\"'",
     "deploy": "alchemy deploy",
     "destroy": "alchemy destroy"

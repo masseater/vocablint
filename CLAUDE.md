@@ -26,6 +26,8 @@ lintの抑止ディレクティブはツールの既定で通るが、検査を�
 
 設定を含むあらゆるものをワークスペース内に置く。
 lint・fmt・checkだけは、Vite+の仕様によりルートの単一設定とする。
+ワークスペースはnxに倣ってapps・libs・tools・infraに分ける。参照してよい向きは、libsをapps・tools・infraから、appsをinfraからだけである。apps同士、tools同士、infra同士も参照しない。fallowのboundariesが落とす。
+アプリのデプロイ設定はappsにコロケーションする。
 必須技術のパッケージはpnpmのstackカタログから参照する。未参照のカタログ項目と未使用の依存はfallowが落とす。
 アプリのsrc/直下には、FSDのレイヤーだけを置く。
 FSDはコロケーションが本質である。使われる場所の近くに置き、再利用されるまで切り出さない。
