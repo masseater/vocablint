@@ -1,12 +1,12 @@
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
+import { ProblemList } from "@vocablint/core";
+import type { Problem } from "@vocablint/core";
 import { Option, Schema } from "effect";
 
 import { JSON_FLAG } from "./cli-contract.ts";
 import { vocablintPlugin } from "./oxlint-rule.ts";
-import { ProblemList } from "./problem.ts";
-import type { Problem } from "./problem.ts";
 
 const CLI_PATH = fileURLToPath(new URL("cli.mjs", import.meta.url));
 const decodeProblems = Schema.decodeUnknownSync(Schema.fromJsonString(ProblemList));

@@ -1,8 +1,6 @@
+import { POSITION_BASE, describeFinding } from "@vocablint/core";
+import type { Problem } from "@vocablint/core";
 import type { Diagnostic, Plugin, Rule } from "vite-plus/lint/plugins";
-
-import { describeFinding } from "./problem.ts";
-import type { Problem } from "./problem.ts";
-import { POSITION_BASE } from "./syntax.ts";
 
 type ProblemLoader = (cwd: string) => readonly Problem[];
 

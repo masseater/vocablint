@@ -1,12 +1,11 @@
 import { runMain } from "@effect/platform-node/NodeRuntime";
 import { layer as nodeServicesLayer } from "@effect/platform-node/NodeServices";
 import type { NodeServices } from "@effect/platform-node/NodeServices";
+import { ProblemList, checkRepository, formatProblem } from "@vocablint/core";
+import type { Problem } from "@vocablint/core";
 import { Cause, Data, Effect, Layer, Option, Path, Schema, Stdio, Stream } from "effect";
 
-import { checkRepository } from "./check.ts";
 import { JSON_FLAG } from "./cli-contract.ts";
-import { ProblemList, formatProblem } from "./problem.ts";
-import type { Problem } from "./problem.ts";
 
 class ProblemsFound extends Data.TaggedError("ProblemsFound")<{ readonly count: number }> {}
 
