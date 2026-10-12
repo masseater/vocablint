@@ -1,9 +1,8 @@
-import { NodeServices } from "@effect/platform-node";
 import { layer } from "@effect/vitest";
 import { Effect } from "effect";
 import { expect } from "vite-plus/test";
 
-import { findingsIn } from "./repository.test.support.ts";
+import { findingsIn, fixtureLayer } from "./repository.test.support.ts";
 
 const dependingOn = (...names: readonly string[]): string =>
   JSON.stringify({
@@ -155,7 +154,7 @@ const ignoresGenericSlotsNumericCoincidencesA = Effect.gen(
   },
 );
 
-layer(NodeServices.layer)("dependency types", (it) => {
+layer(fixtureLayer)("dependency types", (it) => {
   it.effect(
     "reports sets that restate an exported library type",
     () => reportsSetsThatRestateAnExportedLibraryT,

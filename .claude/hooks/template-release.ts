@@ -1,6 +1,7 @@
-import { Effect, FileSystem, Option, Path, Schema, String as Str } from "effect";
+import { Effect, Option, Schema, String as Str } from "effect";
 
 import { getJson, projectDir, runHook, writeJson } from "./env.ts";
+import { HookPlatform } from "./platform.ts";
 
 const TEMPLATE_REPOSITORY = "masseater/typescript-template";
 const MANIFEST_FILE = ".github/release-please/manifest.json";
@@ -25,9 +26,10 @@ const SessionStartOutput = Schema.Struct({
 });
 
 const currentVersion = Effect.gen(function* currentVersion() {
-  const fs = yield* FileSystem.FileSystem;
-  const path = yield* Path.Path;
-  const text = yield* fs.readFileString(path.join(yield* projectDir, MANIFEST_FILE));
+  const platform = yield* HookPlatform;
+  const text = yield* platform
+    .readFile(platform.join(yield* projectDir, MANIFEST_FILE))
+    .pipe(Effect.flatMap((found) => Effect.fromOption(found)));
   const manifest = yield* Schema.decodeEffect(Schema.fromJsonString(Manifest))(text);
   return `v${manifest["."]}`;
 });

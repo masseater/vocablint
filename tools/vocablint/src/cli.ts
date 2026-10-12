@@ -1,9 +1,14 @@
 import { runMain } from "@effect/platform-node/NodeRuntime";
 import { layer as nodeServicesLayer } from "@effect/platform-node/NodeServices";
-import type { NodeServices } from "@effect/platform-node/NodeServices";
-import { ProblemList, checkRepository, formatProblem } from "@vocablint/core";
+import {
+  ProblemList,
+  RepositoryFiles,
+  checkRepository,
+  formatProblem,
+  nodeRepositoryFiles,
+} from "@vocablint/core";
 import type { Problem } from "@vocablint/core";
-import { Cause, Data, Effect, Layer, Option, Path, Schema, Stdio, Stream } from "effect";
+import { Cause, Data, Effect, Layer, Option, Schema, Stdio, Stream } from "effect";
 
 import { JSON_FLAG } from "./cli-contract.ts";
 
@@ -20,10 +25,10 @@ const writeStdout = (text: string): Effect.Effect<void, never, Stdio.Stdio> =>
 const reportText = (
   root: string,
   problems: readonly Problem[],
-): Effect.Effect<void, ProblemsFound, Path.Path | Stdio.Stdio> =>
+): Effect.Effect<void, ProblemsFound, RepositoryFiles | Stdio.Stdio> =>
   Effect.gen(function* report() {
-    const path = yield* Path.Path;
-    const format = formatProblem((file) => path.relative(root, file));
+    const files = yield* RepositoryFiles;
+    const format = formatProblem((file) => files.relative(root, file));
     yield* writeStdout(problems.map((problem) => `${format(problem)}\n`).join(""));
     if (problems.length > NO_PROBLEMS) {
       return yield* new ProblemsFound({ count: problems.length });
@@ -33,9 +38,9 @@ const reportText = (
 
 const vocablint = Effect.gen(function* vocablint() {
   const stdio = yield* Stdio.Stdio;
-  const path = yield* Path.Path;
+  const files = yield* RepositoryFiles;
   const args = yield* stdio.args;
-  const root = path.resolve(".");
+  const root = files.resolve(".");
   const problems = yield* checkRepository(root);
   if (args.includes(JSON_FLAG)) {
     const text = yield* Schema.encodeEffect(Schema.fromJsonString(ProblemList))(problems);
@@ -58,8 +63,10 @@ const reportFailure = <Failure>(
     yield* Stream.make(`${Cause.pretty(cause)}\n`).pipe(Stream.run(stdio.stderr()), Effect.orDie);
   });
 
-const runCli = <Value, Failure>(program: Effect.Effect<Value, Failure, NodeServices>): void => {
-  const main = Layer.build(nodeServicesLayer).pipe(
+const runCli = <Value, Failure>(
+  program: Effect.Effect<Value, Failure, RepositoryFiles | Stdio.Stdio>,
+): void => {
+  const main = Layer.build(nodeRepositoryFiles.pipe(Layer.provideMerge(nodeServicesLayer))).pipe(
     Effect.flatMap((context) =>
       Effect.provideContext(program.pipe(Effect.tapCause(reportFailure)), context),
     ),

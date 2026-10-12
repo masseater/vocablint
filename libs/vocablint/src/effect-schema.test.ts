@@ -1,9 +1,8 @@
-import { NodeServices } from "@effect/platform-node";
 import { layer } from "@effect/vitest";
 import { Effect } from "effect";
 import { expect } from "vite-plus/test";
 
-import { findingsIn } from "./repository.test.support.ts";
+import { findingsIn, fixtureLayer } from "./repository.test.support.ts";
 
 const WITH_EFFECT = JSON.stringify({ name: "fixture", dependencies: { effect: "4.0.0" } });
 
@@ -45,7 +44,7 @@ const acceptsSchemasBuiltFromTheOwner = Effect.gen(function* acceptsSchemasBuilt
   expect(findings).toStrictEqual([]);
 });
 
-layer(NodeServices.layer)("Effect Schema", (it) => {
+layer(fixtureLayer)("Effect Schema", (it) => {
   it.effect(
     "reads literal sets from Schema.Literals and unions of Schema.Literal",
     () => readsLiteralSetsFromSchemaLiteralsAndUni,
