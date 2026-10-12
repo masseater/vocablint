@@ -141,6 +141,20 @@
       "skillPath": ".agents/skills/hono/SKILL.md",
       "computedHash": "5bbd7991532628874467abe71cbe4cb4651d6f5566e24524859ca320119a715d"
     },
+    "how-to-use-react": {
+      "source": "masseater/skills",
+      "ref": "7e5f902fefc75b1f1736a0f9d2a580fb7cc4a5b3",
+      "sourceType": "github",
+      "skillPath": "skills/how-to-use-react/SKILL.md",
+      "computedHash": "8248f2f3a259f7242be00713ed18d3f1d9ff6792b502c532c7cde47bc784666b"
+    },
+    "integrate": {
+      "source": "masseater/skills",
+      "ref": "7e5f902fefc75b1f1736a0f9d2a580fb7cc4a5b3",
+      "sourceType": "github",
+      "skillPath": "skills/integrate/SKILL.md",
+      "computedHash": "e3373d2c63b9e2a1dca5c7daa77a0a21013f13789dc98a5afaf20b07eb0b6338"
+    },
     "issue-branch-pr-flow": {
       "source": "philtzjp/skills",
       "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
@@ -178,10 +192,10 @@
     },
     "measure-dont-guess": {
       "source": "masseater/skills",
-      "ref": "e0ac8eabaafbf78d9e7e1731d75e4236d45cc6e4",
+      "ref": "7e5f902fefc75b1f1736a0f9d2a580fb7cc4a5b3",
       "sourceType": "github",
       "skillPath": "skills/measure-dont-guess/SKILL.md",
-      "computedHash": "26c3183fedaad983b439d63804240dd4d822ce87f0ca0718e85e6b96b4ef910d"
+      "computedHash": "8abc7237a86085a584d25e6afc77960bbafe867edcf6e8bdcd6b0357f95f8ee1"
     },
     "modern-web-guidance": {
       "source": "GoogleChrome/modern-web-guidance",
@@ -199,7 +213,7 @@
     },
     "setup-github": {
       "source": "masseater/skills",
-      "ref": "e0ac8eabaafbf78d9e7e1731d75e4236d45cc6e4",
+      "ref": "7e5f902fefc75b1f1736a0f9d2a580fb7cc4a5b3",
       "sourceType": "github",
       "skillPath": "skills/setup-github/SKILL.md",
       "computedHash": "95112c6fadc0712bc49e6c3e7fdb03c8961896e78b0501e092ada6d51dd8c93e"
@@ -210,6 +224,13 @@
       "sourceType": "github",
       "skillPath": "skills/shadcn/SKILL.md",
       "computedHash": "da388f632cd83783c02967446e21941c9ee8291ccb43ba74c23f7d4e9b7c298c"
+    },
+    "skill-authoring": {
+      "source": "masseater/skills",
+      "ref": "7e5f902fefc75b1f1736a0f9d2a580fb7cc4a5b3",
+      "sourceType": "github",
+      "skillPath": "skills/skill-authoring/SKILL.md",
+      "computedHash": "6d89941deb855bdca0e42e675fb8a36d6b7adb487948edf45eaddcd01b230062"
     },
     "skill-escalation": {
       "source": "philtzjp/skills",
