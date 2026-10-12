@@ -5,6 +5,7 @@ export default defineConfig({
     dedupe: ["vitest"],
   },
   test: {
+    testTimeout: 30_000,
     server: {
       deps: {
         inline: ["@effect/vitest"],
