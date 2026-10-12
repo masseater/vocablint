@@ -80,7 +80,7 @@ Cloudflare の認証情報は環境変数ではなく Alchemy のプロファイ
 ## GitHub の設定
 
 Actions の secrets、Actions による PR 作成の許可、PR を作れる人の制限、既定ブランチのルールセットを gh で設定する。
-手順は `setup-github` スキル（`docs/skills/setup-github/SKILL.md`）にある。
+手順は `setup-github` スキル（[masseater/skills](https://github.com/masseater/skills)）にある。
 
 ## 起動とデプロイ
 
