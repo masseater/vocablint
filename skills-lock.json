@@ -45,7 +45,7 @@
     },
     "feature-sliced-design": {
       "source": "feature-sliced/skills",
-      "ref": "538e1002f89a2f168ec849ea469493799cb0b6e1",
+      "ref": "5e95aaebb84541742686e56352b7569acf4306f1",
       "sourceType": "github",
       "skillPath": "feature-sliced-design/SKILL.md",
       "computedHash": "98d09ea1a9acac34fc5720c610c4ee7c7780dd30b2f287d733961f8e7e9d980b"
