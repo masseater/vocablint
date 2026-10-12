@@ -1,3 +1,5 @@
+import decisionPlugin from "./decision-rules.ts";
+
 const REACT_STATE_HOOKS: readonly string[] = [
   "useState",
   "useReducer",
@@ -172,4 +174,10 @@ const generated = [
   "CHANGELOG.md",
 ];
 
-export { generated, requiredStack, restrictedImports };
+const decisionPluginName = decisionPlugin.meta.name;
+
+const decisionRuleNames = Object.keys(decisionPlugin.rules).map(
+  (id) => `${decisionPluginName}/${id}`,
+);
+
+export { decisionPluginName, decisionRuleNames, generated, requiredStack, restrictedImports };
