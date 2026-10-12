@@ -27,7 +27,7 @@ interface Annotated {
   readonly conceptId: string;
 }
 
-const OWNER_TAG = "canonical-values";
+const OWNER_TAG = "vocablint";
 const FIRST_OWNER_COUNT = 1;
 
 const ownerKeyOf = (declaration: ts.Declaration): Option.Option<string> => {
@@ -100,15 +100,11 @@ const ownerOf =
     if (!isModuleConst(node)) {
       return scanned(
         [],
-        [
-          annotationProblem("@canonical-values registers an owner only on a module-scope const.")(
-            node,
-          ),
-        ],
+        [annotationProblem("@vocablint registers an owner only on a module-scope const.")(node)],
       );
     }
     if (conceptId === "") {
-      return scanned([], [annotationProblem("@canonical-values needs a concept id.")(node)]);
+      return scanned([], [annotationProblem("@vocablint needs a concept id.")(node)]);
     }
     const values = ownerValuesOf(project.program.getTypeChecker())(node);
     return Option.match(Option.all([values, ownerKeyOf(node)]), {
