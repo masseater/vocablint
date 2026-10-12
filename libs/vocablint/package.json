@@ -1,63 +1,24 @@
 {
-  "name": "@r_masseater/vocablint",
+  "name": "@vocablint/core",
   "version": "0.0.0",
-  "description": "Point every finite value set and object shape at the one place that already owns it: a registered owner in the repository or a dependency type.",
-  "keywords": [
-    "effect",
-    "lint",
-    "typescript",
-    "vocabulary"
-  ],
-  "homepage": "https://github.com/masseater/vocablint#readme",
-  "bugs": {
-    "url": "https://github.com/masseater/vocablint/issues"
-  },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/masseater/vocablint.git",
-    "directory": "libs/vocablint"
-  },
-  "bin": {
-    "vocablint": "./dist/cli.mjs"
-  },
-  "files": [
-    "dist"
-  ],
+  "private": true,
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.mts",
-      "default": "./dist/index.mjs"
-    },
-    "./oxlint": {
-      "types": "./dist/oxlint.d.mts",
-      "default": "./dist/oxlint.mjs"
-    },
-    "./package.json": "./package.json"
-  },
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
+    ".": "./src/index.ts"
   },
   "scripts": {
-    "build": "vp pack",
-    "test": "vp test run",
-    "prepublishOnly": "vp run build"
+    "test": "vp test run"
   },
   "dependencies": {
-    "@effect/platform-node": "catalog:",
     "effect": "catalog:stack",
     "typescript-6": "catalog:"
   },
   "devDependencies": {
+    "@effect/platform-node": "catalog:",
     "@effect/vitest": "catalog:",
     "@types/node": "catalog:",
     "typescript": "catalog:stack",
     "vite-plus": "catalog:stack",
     "vitest": "catalog:"
-  },
-  "engines": {
-    "node": ">=22"
   }
 }

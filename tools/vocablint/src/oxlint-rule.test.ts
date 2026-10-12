@@ -1,8 +1,8 @@
+import type { Problem } from "@vocablint/core";
 import { RuleTester } from "vite-plus/lint/plugins-dev";
 import { describe, it } from "vite-plus/test";
 
 import { vocabularyRule } from "./oxlint-rule.ts";
-import type { Problem } from "./problem.ts";
 
 const CWD = "/repository";
 const FLAGGED = "/repository/src/flagged.ts";

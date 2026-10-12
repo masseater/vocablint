@@ -12,12 +12,4 @@ export default defineConfig({
       },
     },
   },
-  pack: {
-    entry: ["src/index.ts", "src/cli.ts", "src/oxlint.ts"],
-    platform: "node",
-    sourcemap: true,
-    dts: {
-      generator: "tsgo",
-    },
-  },
 });
