@@ -72,7 +72,7 @@ jobs:
 
   release:
     needs: verify
-    if: github.event_name == 'push' && github.repository == 'masseater/typescript-template'
+    if: github.repository == 'masseater/typescript-template'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -84,3 +84,10 @@ jobs:
         with:
           config-file: .github/release-please/config.json
           manifest-file: .github/release-please/manifest.json
+          skip-github-pull-request: true
+      - if: github.event_name == 'workflow_dispatch'
+        uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          config-file: .github/release-please/config.json
+          manifest-file: .github/release-please/manifest.json
+          skip-github-release: true
