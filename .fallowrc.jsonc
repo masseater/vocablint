@@ -3,7 +3,7 @@
   "production": true,
   "boundaries": {
     "zones": [
-      { "name": "apps", "autoDiscover": ["apps"] },
+      { "name": "apps", "patterns": ["apps/**"], "autoDiscover": ["apps"] },
       { "name": "libs", "patterns": ["libs/**"] },
       { "name": "tools", "patterns": ["tools/**"], "autoDiscover": ["tools"] },
       { "name": "infra", "patterns": ["infra/**"], "autoDiscover": ["infra"] },

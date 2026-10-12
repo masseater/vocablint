@@ -253,8 +253,6 @@ export default defineConfig({
           "markdown-lint",
           "renovate",
           "actions-lint",
-          "steiger-all",
-          "db-check-all",
           "fallow-all",
           "gitleaks",
         ],
@@ -262,8 +260,6 @@ export default defineConfig({
       "test-all": "vp run -r test",
       eslint: "NODE_OPTIONS=--max-old-space-size=4096 eslint --max-warnings 0 .",
       syncpack: "syncpack lint",
-      "steiger-all": "vp run -r steiger",
-      "db-check-all": "vp run -r db:check",
       "fallow-all": "vp run -r fallow",
       gitleaks: {
         command: "go run github.com/zricethezav/gitleaks/v8@v8.30.1 git --redact --no-banner",
