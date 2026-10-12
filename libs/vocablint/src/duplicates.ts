@@ -35,7 +35,7 @@ const duplicateProblems =
             .join(", ");
           return problemAt({
             rule: "duplicate-value-set",
-            message: `The values ${formatValues(site.values)} are also declared at ${others}. Register one owner with @canonical-values and derive the others from it.`,
+            message: `The values ${formatValues(site.values)} are also declared at ${others}. Register one owner with @vocablint and derive the others from it.`,
           })(site.node);
         }),
       );
