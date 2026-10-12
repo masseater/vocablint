@@ -36,6 +36,7 @@ catalog:
   skills: 1.7.1
   "@tanstack/intent": 0.5.5
   "@yarnpkg/parsers": 3.1.0
+  vitest: 5.0.3
 catalogs:
   stack:
     "@distilled.cloud/cloudflare": 1.0.0-rc.13
