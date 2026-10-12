@@ -89,6 +89,10 @@ Effect から外部 API や SaaS を呼ぶクライアントは手で包まず�
 - 計測は本番環境で行えるようにする。できないときは、あらゆる手段で本番同等を保証したステージング環境を作って行う。手元やテスト環境だけの計測は判断の根拠にしない。
 - 実践の手順は `measure-dont-guess` スキルにある。不具合の調査は `systematic-debugging`、完了の確認は `verification-before-completion` スキルに従う。
 
+## 脆弱性スキャン
+
+- 依存パッケージの既知の脆弱性は、verify の `audit` タスク（`vp pm audit`）が落とす。直すときは `vp pm audit --fix` で `pnpm-workspace.yaml` の overrides に修正版を足す。修正版が出ていない勧告だけを、`auditConfig.ignoreGhsas` に GHSA の ID で載せ、理由をコミットメッセージに書く。
+
 ## スキル
 
 - 複数のリポジトリで共通に使う自作のスキルは https://github.com/masseater/skills に置き、skills CLI で `skills-lock.json` に追加する。リポジトリにコピーしない。
