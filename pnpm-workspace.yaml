@@ -53,6 +53,12 @@ overrides:
   "@effect/vitest": "catalog:"
   vite@*: npm:@voidzero-dev/vite-plus-core@1.1.0
   eslint-plugin-react-hooks>zod-validation-error: ^5.0.0
+  "@hono/node-server@<1.19.15": ^1.19.15
+  hono@<4.13.7: ^4.13.7
+  http-cache-semantics@<=4.2.0: ^4.3.0
+  lodash@<=4.17.23: ^4.18.1
+  source-map-js@>=1.0.0 <1.2.2: ^1.2.2
+  valibot@<=1.4.1: ^1.4.2
 peerDependencyRules:
   allowAny:
     - vite
@@ -73,3 +79,7 @@ patchedDependencies:
   "@tanstack/eslint-plugin-start@0.1.0": patches/@tanstack__eslint-plugin-start@0.1.0.patch
 minimumReleaseAgeExclude:
   - "@r_masseater/oxlint-plugin-decision@0.0.4"
+auditConfig:
+  ignoreGhsas:
+    - GHSA-vfj7-8cjw-p6xm
+    - GHSA-hp3w-g68c-fv3c

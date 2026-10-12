@@ -255,12 +255,17 @@ export default defineConfig({
           "actions-lint",
           "fallow-all",
           "gitleaks",
+          "audit",
         ],
       },
       "test-all": "vp run -r test",
       eslint: "NODE_OPTIONS=--max-old-space-size=4096 eslint --max-warnings 0 .",
       syncpack: "syncpack lint",
       "fallow-all": "vp run -r fallow",
+      audit: {
+        command: "vp pm audit",
+        cache: false,
+      },
       gitleaks: {
         command: "go run github.com/zricethezav/gitleaks/v8@v8.30.1 git --redact --no-banner",
         cache: false,
