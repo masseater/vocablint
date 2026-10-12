@@ -1,2 +1,8 @@
 5ff9d005141e96c4aba659f839a3d9b5dad8d02c:docs/skills/measure-dont-guess/SKILL.md:curl-auth-user:64
 5ff9d005141e96c4aba659f839a3d9b5dad8d02c:docs/skills/measure-dont-guess/SKILL.md:curl-auth-user:65
+2985c4199cb141364ca42ea2e37715e99c44730d:.claude/skills/cloudflare/references/argo-smart-routing/README.md:curl-auth-header:13
+2985c4199cb141364ca42ea2e37715e99c44730d:.claude/skills/cloudflare/references/argo-smart-routing/api.md:curl-auth-header:27
+2985c4199cb141364ca42ea2e37715e99c44730d:.claude/skills/cloudflare/references/argo-smart-routing/api.md:curl-auth-header:84
+2985c4199cb141364ca42ea2e37715e99c44730d:.claude/skills/workers-best-practices/references/configuration.md:generic-api-key:82
+9f45666e2f3f90f9070936ff78084f307a15c334:docs/skills/measure-dont-guess/SKILL.md:curl-auth-user:89
+9f45666e2f3f90f9070936ff78084f307a15c334:docs/skills/measure-dont-guess/SKILL.md:curl-auth-user:90

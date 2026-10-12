@@ -127,10 +127,9 @@
       ],
     },
     {
-      "name": "jev-lint",
-      "enablers": ["jev-lint"],
-      "configPatterns": [".jev-lint.yaml"],
-      "toolingDependencies": ["jev-lint"],
+      "name": "oxlint-plugin-decision",
+      "enablers": ["@r_masseater/oxlint-plugin-decision"],
+      "entryPoints": ["decision-rules.ts"],
     },
     {
       "name": "skills",

@@ -13,12 +13,6 @@
   },
   "enabledMcpjsonServers": ["fallow"],
   "extraKnownMarketplaces": {
-    "jev-lint": {
-      "source": {
-        "source": "github",
-        "repo": "mizchi/jev-lint"
-      }
-    },
     "cc-jev-teacher": {
       "source": {
         "source": "github",
@@ -27,7 +21,6 @@
     }
   },
   "enabledPlugins": {
-    "jev-lint@jev-lint": true,
     "cc-jev-teacher@cc-jev-teacher": true
   },
   "hooks": {

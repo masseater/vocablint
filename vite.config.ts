@@ -30,6 +30,12 @@ const eslintReactRules = asErrors(
   ),
 );
 
+const decisionRules = asErrors(
+  ["exclusive-status", "server-state-tanstack-query", "ui-state-effect-atom"].map(
+    (id) => `stack/${id}`,
+  ),
+);
+
 const effectRules = asErrors(
   Object.values(effectPresets).flatMap((preset) => Object.keys(preset.rules ?? {})),
 );
@@ -80,6 +86,7 @@ export default defineConfig({
       { name: "no-comments", specifier: "eslint-plugin-no-comments" },
       { name: "baseline-js", specifier: "eslint-plugin-baseline-js" },
       { name: "@html-eslint/react", specifier: "@html-eslint/eslint-plugin-react" },
+      { name: "stack", specifier: "./decision-rules.ts" },
     ],
     rules: {
       "vite-plus/prefer-vite-plus-imports": "error",
@@ -169,7 +176,7 @@ export default defineConfig({
     },
     overrides: [
       {
-        files: ["**/*.config.ts", "**/alchemy.run.ts"],
+        files: ["**/*.config.ts", "**/alchemy.run.ts", "decision-rules.ts"],
         rules: { "import/no-default-export": "off" },
       },
       {
@@ -186,7 +193,18 @@ export default defineConfig({
         files: ["**/shared/ui/**"],
         rules: { "shadcn/no-restyle": "off", "react/jsx-props-no-spreading": "off" },
       },
+      {
+        files: ["apps/web/src/**/*.{ts,tsx}"],
+        rules: decisionRules,
+      },
+      {
+        files: ["**/*.test.ts"],
+        rules: Object.fromEntries(Object.keys(decisionRules).map((name) => [name, "off"] as const)),
+      },
     ],
+    settings: {
+      stack: { model: "openrouter/perplexity/pplx-decider-v1.1-27b" },
+    },
     options: {
       typeAware: true,
       typeCheck: true,
@@ -214,6 +232,19 @@ export default defineConfig({
       },
       verify: {
         command: "vp check",
+        cache: {
+          env: ["OPENROUTER_API_KEY"],
+          untrackedEnv: [
+            "CLAUDECODE",
+            "CLAUDE_CODE_REMOTE",
+            "HTTPS_PROXY",
+            "https_proxy",
+            "NO_PROXY",
+            "no_proxy",
+            "SSL_CERT_FILE",
+            "NODE_EXTRA_CA_CERTS",
+          ],
+        },
         dependsOn: [
           "test-all",
           "eslint",
@@ -235,10 +266,6 @@ export default defineConfig({
       "fallow-all": "vp run -r fallow",
       gitleaks: {
         command: "go run github.com/zricethezav/gitleaks/v8@v8.30.1 git --redact --no-banner",
-        cache: false,
-      },
-      "jev-lint": {
-        command: "jev-lint review --base origin/main",
         cache: false,
       },
     },
