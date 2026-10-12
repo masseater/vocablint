@@ -1,6 +1,6 @@
 import { Effect, Layer, Logger, ManagedRuntime } from "effect";
 
-import { featureFlagsLive } from "#/shared/flags/index.server";
+import { featureFlagsLive } from "#/pages/home/config/feature-flags.server";
 
 import { cloudflareLogger, withCloudflareTracing } from "./tracing.server";
 
