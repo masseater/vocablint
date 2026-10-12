@@ -1,13 +1,4 @@
-import {
-  Array as Arr,
-  Effect,
-  FileSystem,
-  Function as Fn,
-  Option,
-  Order,
-  Path,
-  Predicate,
-} from "effect";
+import { Array as Arr, Effect, Function as Fn, Option, Order, Predicate } from "effect";
 import ts from "typescript-6";
 
 import {
@@ -19,6 +10,7 @@ import {
 } from "./dependencies.ts";
 import { libraryIndex } from "./library.ts";
 import type { LibraryIndex } from "./library.ts";
+import { RepositoryFiles } from "./repository-files.ts";
 
 interface Project {
   readonly packageName: Option.Option<string>;
@@ -40,29 +32,33 @@ const SKIPPED_DIRECTORIES: ReadonlySet<string> = new Set([NODE_MODULES, "dist", 
 
 const listConfigFiles = (
   directory: string,
-): Effect.Effect<readonly string[], never, FileSystem.FileSystem | Path.Path> =>
+): Effect.Effect<readonly string[], never, RepositoryFiles> =>
   Effect.gen(function* configFilesUnder() {
-    const fs = yield* FileSystem.FileSystem;
-    const path = yield* Path.Path;
-    const names = yield* fs.readDirectory(directory).pipe(Effect.orElseSucceed(() => []));
+    const files = yield* RepositoryFiles;
+    const names = yield* files.readDirectory(directory);
     const visible = names
       .filter((name) => !name.startsWith(HIDDEN_PREFIX) && !SKIPPED_DIRECTORIES.has(name))
-      .map((name) => path.join(directory, name));
+      .map((name) => files.join(directory, name));
     const nested = yield* Fn.pipe(
       visible,
       Effect.forEach((entryPath) =>
-        fs.stat(entryPath).pipe(
+        files.isDirectory(entryPath).pipe(
           Effect.flatMap(
-            (info): Effect.Effect<readonly string[], never, FileSystem.FileSystem | Path.Path> => {
-              if (info.type === "Directory") {
-                return listConfigFiles(entryPath);
-              }
-              return Effect.succeed(
-                Arr.filter([entryPath], () => path.basename(entryPath) === CONFIG_FILE),
-              );
-            },
+            Option.match({
+              onNone: (): Effect.Effect<readonly string[], never, RepositoryFiles> =>
+                Effect.succeed([]),
+              onSome: (
+                directoryEntry,
+              ): Effect.Effect<readonly string[], never, RepositoryFiles> => {
+                if (directoryEntry) {
+                  return listConfigFiles(entryPath);
+                }
+                return Effect.succeed(
+                  Arr.filter([entryPath], () => files.basename(entryPath) === CONFIG_FILE),
+                );
+              },
+            }),
           ),
-          Effect.orElseSucceed((): readonly string[] => []),
         ),
       ),
     );
@@ -82,14 +78,11 @@ const parseConfig = (configPath: string): Option.Option<ts.ParsedCommandLine> =>
 const nearestPackageDirectory = (
   directory: string,
   root: string,
-): Effect.Effect<string, never, FileSystem.FileSystem | Path.Path> =>
+): Effect.Effect<string, never, RepositoryFiles> =>
   Effect.gen(function* nearestPackage() {
-    const fs = yield* FileSystem.FileSystem;
-    const path = yield* Path.Path;
-    const hasManifest = yield* fs
-      .exists(path.join(directory, MANIFEST_FILE))
-      .pipe(Effect.orElseSucceed(() => false));
-    const parent = path.dirname(directory);
+    const files = yield* RepositoryFiles;
+    const hasManifest = yield* files.exists(files.join(directory, MANIFEST_FILE));
+    const parent = files.dirname(directory);
     if (hasManifest || directory === root || parent === directory) {
       return directory;
     }
@@ -100,8 +93,8 @@ const packageInfoOf = Effect.fn("packageInfoOf")(function* packageInfoOf(
   configPath: string,
   root: string,
 ) {
-  const path = yield* Path.Path;
-  const directory = yield* nearestPackageDirectory(path.dirname(configPath), root);
+  const files = yield* RepositoryFiles;
+  const directory = yield* nearestPackageDirectory(files.dirname(configPath), root);
   const manifest = yield* readManifest(directory);
   return {
     directory,

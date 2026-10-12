@@ -1,4 +1,6 @@
-import { Array as Arr, Effect, FileSystem, Option, Order, Path, Predicate, Schema } from "effect";
+import { Array as Arr, Effect, Option, Order, Predicate, Schema } from "effect";
+
+import { RepositoryFiles } from "./repository-files.ts";
 
 interface DependencyEntry {
   readonly packageName: string;
@@ -37,9 +39,10 @@ const DECLARATIONS_SUFFIX = /\.d\.[cm]?ts$|\.[cm]?tsx?$/u;
 const SCRIPT_SUFFIX = /\.(?<module>[cm]?)js$/u;
 
 const readManifest = Effect.fn("readManifest")(function* readManifest(directory: string) {
-  const fs = yield* FileSystem.FileSystem;
-  const path = yield* Path.Path;
-  const text = yield* fs.readFileString(path.join(directory, MANIFEST_FILE));
+  const files = yield* RepositoryFiles;
+  const text = yield* Effect.fromOption(
+    yield* files.readFile(files.join(directory, MANIFEST_FILE)),
+  );
   return yield* Schema.decodeEffect(Schema.fromJsonString(PackageManifest))(text);
 }, Effect.option);
 
@@ -117,14 +120,13 @@ const firstDeclarationsAmong = Effect.fn("firstDeclarationsAmong")(function* fir
   directory: string,
   entryPaths: readonly string[],
 ) {
-  const fs = yield* FileSystem.FileSystem;
-  const path = yield* Path.Path;
+  const files = yield* RepositoryFiles;
   const candidates = Arr.getSomes(
     entryPaths.map((entryPath) => declarationsCandidateFor(entryPath)),
   );
   const existing = yield* Effect.filter(
-    candidates.map((candidate) => path.join(directory, candidate)),
-    (candidate) => fs.exists(candidate).pipe(Effect.orElseSucceed(() => false)),
+    candidates.map((candidate) => files.join(directory, candidate)),
+    (candidate) => files.exists(candidate),
   );
   return Arr.head(existing);
 });
@@ -214,13 +216,13 @@ const entryOrder = Order.mapInput(Order.String, (entry: DependencyEntry) => entr
 const dependencyEntries = Effect.fn("dependencyEntries")(function* dependencyEntries(
   packageDirectory: string,
 ) {
-  const path = yield* Path.Path;
+  const files = yield* RepositoryFiles;
   const manifest = yield* readManifest(packageDirectory);
   if (Option.isNone(manifest)) {
     return [];
   }
   const entries = yield* Effect.forEach(declaredDependencies(manifest.value), (packageName) =>
-    entriesOfDependency(packageName, path.join(packageDirectory, NODE_MODULES, packageName)),
+    entriesOfDependency(packageName, files.join(packageDirectory, NODE_MODULES, packageName)),
   );
   return Arr.sort(
     Arr.dedupeWith(entries.flat(), (left, right) => left.specifier === right.specifier),

@@ -1,5 +1,7 @@
 import { Context } from "effect";
-import type { Effect, FileSystem, Option, Path, Schema, Stdio } from "effect";
+import type { Effect, Option, Schema } from "effect";
+
+type Sink = "stdout" | "stderr";
 
 interface CommandResult {
   readonly succeeded: boolean;
@@ -15,10 +17,16 @@ class HookPlatform extends Context.Service<
       url: string,
       schema: Codec,
     ) => Effect.Effect<Option.Option<Codec["Type"]>, never, Codec["DecodingServices"]>;
+    readonly readStdin: Effect.Effect<string>;
+    readonly write: (sink: Sink, text: string) => Effect.Effect<void>;
+    readonly exists: (file: string) => Effect.Effect<boolean>;
+    readonly readFile: (file: string) => Effect.Effect<Option.Option<string>>;
+    readonly resolve: (...segments: readonly string[]) => string;
+    readonly join: (...segments: readonly string[]) => string;
+    readonly relative: (from: string, to: string) => string;
+    readonly sep: string;
   }
 >()("claude-harness/hooks/platform/HookPlatform") {}
 
-type HookServices = HookPlatform | FileSystem.FileSystem | Path.Path | Stdio.Stdio;
-
 export { HookPlatform };
-export type { CommandResult, HookServices };
+export type { CommandResult, Sink };

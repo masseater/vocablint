@@ -9,7 +9,7 @@ catalogMode: prefer
 
 catalog:
   "@ast-grep/cli": 0.45.3
-  "@effect/platform-node": 4.0.0
+  "@effect/platform-node": 4.0.2
   "@eslint-react/eslint-plugin": 5.24.10
   "@shadcn/lint": 0.2.0
   "@tanstack/eslint-plugin-query": 5.104.1
@@ -32,14 +32,14 @@ catalog:
   "@tanstack/intent": 0.5.5
   "@yarnpkg/parsers": 3.1.0
   vitest: 5.0.3
-  "@effect/vitest": 4.0.0
+  "@effect/vitest": 4.0.2
   typescript-6: npm:@typescript/typescript6@6.0.2
 catalogs:
   stack:
     "@distilled.cloud/cloudflare": 1.0.0-rc.13
-    "@effect/tsgo": 0.50.0
+    "@effect/tsgo": 0.51.1
     alchemy: 2.0.0-beta.81
-    effect: 4.0.0
+    effect: 4.0.2
     fallow: 3.32.0
     renovate: 44.148.6
     textlint: 15.8.0
@@ -47,9 +47,9 @@ catalogs:
     vite-plus: 1.1.0
 overrides:
   effect: "catalog:stack"
-  "@effect/platform-node-shared": 4.0.0
-  "@effect/sql-d1": 4.0.0
-  "@effect/sql-sqlite-do": 4.0.0
+  "@effect/platform-node-shared": 4.0.2
+  "@effect/sql-d1": 4.0.2
+  "@effect/sql-sqlite-do": 4.0.2
   "@effect/vitest": "catalog:"
   vite@*: npm:@voidzero-dev/vite-plus-core@1.1.0
   eslint-plugin-react-hooks>zod-validation-error: ^5.0.0

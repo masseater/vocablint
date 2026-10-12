@@ -1,11 +1,10 @@
-import { NodeServices } from "@effect/platform-node";
 import { layer } from "@effect/vitest";
 import { Effect } from "effect";
-import type { FileSystem, Path } from "effect";
 import { expect } from "vite-plus/test";
 
 import { dependencyEntries } from "./dependencies.ts";
-import { directoryWith } from "./repository.test.support.ts";
+import type { RepositoryFiles } from "./repository-files.ts";
+import { directoryWith, fixtureLayer } from "./repository.test.support.ts";
 
 interface RelativeEntry {
   readonly specifier: string;
@@ -16,7 +15,7 @@ const manifest = (fields: object): string => JSON.stringify(fields);
 
 const relativeEntries = (
   packageDirectory: string,
-): Effect.Effect<readonly RelativeEntry[], never, FileSystem.FileSystem | Path.Path> =>
+): Effect.Effect<readonly RelativeEntry[], never, RepositoryFiles> =>
   dependencyEntries(packageDirectory).pipe(
     Effect.map((entries) =>
       entries.map((entry) => ({
@@ -235,7 +234,7 @@ const hasNothingToOfferWithoutDependenciesOrWi = Effect.gen(
   },
 );
 
-layer(NodeServices.layer)("dependencyEntries export maps", (it) => {
+layer(fixtureLayer)("dependencyEntries export maps", (it) => {
   it.effect(
     "reads the root types condition of an export map",
     () => readsTheRootTypesConditionOfAnExportMap,
@@ -262,7 +261,7 @@ layer(NodeServices.layer)("dependencyEntries export maps", (it) => {
   );
 });
 
-layer(NodeServices.layer)("dependencyEntries manifests", (it) => {
+layer(fixtureLayer)("dependencyEntries manifests", (it) => {
   it.effect(
     "finds a types condition nested under another condition",
     () => findsATypesConditionNestedUnderAnotherCo,

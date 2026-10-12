@@ -1,9 +1,8 @@
-import { NodeServices } from "@effect/platform-node";
 import { layer } from "@effect/vitest";
 import { Effect } from "effect";
 import { expect } from "vite-plus/test";
 
-import { findingsIn } from "./repository.test.support.ts";
+import { findingsIn, fixtureLayer } from "./repository.test.support.ts";
 
 const STATUS_OWNER = [
   "/** @vocablint order.status */",
@@ -91,7 +90,7 @@ const reportsTheSameUnregisteredSetDeclaredTwi = Effect.gen(
   },
 );
 
-layer(NodeServices.layer)("repository owners", (it) => {
+layer(fixtureLayer)("repository owners", (it) => {
   it.effect(
     "reports sets that restate, extend or spell out an owner's values",
     () => reportsSetsThatRestateExtendOrSpellOutAn,

@@ -1,5 +1,4 @@
-import { Array as Arr, Effect, FileSystem, Path, Schema, pipe } from "effect";
-import type { Stdio } from "effect";
+import { Array as Arr, Effect, Schema, pipe } from "effect";
 
 import {
   blockWhen,
@@ -10,6 +9,7 @@ import {
   runHook,
   writeJson,
 } from "./env.ts";
+import { HookPlatform } from "./platform.ts";
 import type { CommandResult } from "./platform.ts";
 
 const PostToolUseInput = Schema.Struct({
@@ -24,10 +24,10 @@ const PostToolUseOutput = Schema.Struct({
 });
 
 const locate = Effect.fn("locate")(function* locate(filePath: string) {
-  const path = yield* Path.Path;
+  const platform = yield* HookPlatform;
   const root = yield* projectRoot;
-  const [scope = "", name = ""] = path.relative(root, filePath).split(path.sep);
-  const candidates = [scope, path.join(scope, name)].filter((dir) => dir !== "");
+  const [scope = "", name = ""] = platform.relative(root, filePath).split(platform.sep);
+  const candidates = [scope, platform.join(scope, name)].filter((dir) => dir !== "");
   return { candidates, root };
 });
 
@@ -35,13 +35,10 @@ const fallowTargets = Effect.fn("fallowTargets")(function* fallowTargets(
   root: string,
   candidates: readonly string[],
 ) {
-  const fs = yield* FileSystem.FileSystem;
-  const path = yield* Path.Path;
+  const platform = yield* HookPlatform;
   const withConfig = yield* pipe(
     candidates,
-    Effect.filter((dir: string) =>
-      fs.exists(path.join(root, dir, ".fallowrc.jsonc")).pipe(Effect.orDie),
-    ),
+    Effect.filter((dir: string) => platform.exists(platform.join(root, dir, ".fallowrc.jsonc"))),
   );
   return [[], ...withConfig.map((dir) => ["-r", dir])];
 });
@@ -64,7 +61,7 @@ const runFallow = Effect.fn("runFallow")(function* runFallow(
 
 const reportDuplication = (
   runs: readonly CommandResult[],
-): Effect.Effect<void, never, Stdio.Stdio> => {
+): Effect.Effect<void, never, HookPlatform> => {
   const duplication = Arr.dedupe(
     runs
       .flatMap((run) => run.stdout.split("\n"))
