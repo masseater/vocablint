@@ -1,4 +1,13 @@
-import { Array as Arr, Effect, FileSystem, Function as Fn, Option, Order, Path } from "effect";
+import {
+  Array as Arr,
+  Effect,
+  FileSystem,
+  Function as Fn,
+  Option,
+  Order,
+  Path,
+  Predicate,
+} from "effect";
 import ts from "typescript-6";
 
 import { dependencyEntries, readManifest, workspaceDependencies } from "./dependencies.ts";
@@ -107,6 +116,39 @@ const skipsTypeChecking = (sourceFile: ts.SourceFile): boolean =>
     NO_CHECK_PRAGMA.test(sourceFile.text.slice(range.pos, range.end)),
   );
 
+const DECLARATION_EXTENSION = ".d.ts";
+
+const declarationFiles = new Map<string, ts.SourceFile>();
+
+type ReadSourceFile = ts.CompilerHost["getSourceFile"];
+
+const cachedDeclaration =
+  (readSourceFile: ReadSourceFile): ReadSourceFile =>
+  (fileName, languageVersion, onError) => {
+    const key = `${fileName}\0${JSON.stringify(languageVersion)}`;
+    const sourceFile =
+      declarationFiles.get(key) ?? readSourceFile(fileName, languageVersion, onError);
+    if (Predicate.isNotUndefined(sourceFile)) {
+      declarationFiles.set(key, sourceFile);
+    }
+    return sourceFile;
+  };
+
+const sharingDeclarations = (parsed: ts.ParsedCommandLine): ts.CompilerHost => {
+  const host = ts.createCompilerHost(parsed.options);
+  const readSourceFile = host.getSourceFile.bind(host);
+  const readDeclaration = cachedDeclaration(readSourceFile);
+  return {
+    ...host,
+    getSourceFile: (fileName, languageVersion, onError) => {
+      if (fileName.endsWith(DECLARATION_EXTENSION)) {
+        return readDeclaration(fileName, languageVersion, onError);
+      }
+      return readSourceFile(fileName, languageVersion, onError);
+    },
+  };
+};
+
 const buildProject = Effect.fn("buildProject")(function* buildProject(
   parsed: ts.ParsedCommandLine,
   info: PackageInfo,
@@ -115,6 +157,7 @@ const buildProject = Effect.fn("buildProject")(function* buildProject(
   const program = ts.createProgram({
     rootNames: [...parsed.fileNames, ...entries.map((entry) => entry.declarationsPath)],
     options: { ...parsed.options, noEmit: true },
+    host: sharingDeclarations(parsed),
   });
   program.getTypeChecker();
   const projectFiles = new Set(parsed.fileNames);
