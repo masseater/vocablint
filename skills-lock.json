@@ -20,7 +20,7 @@
       "ref": "c430dd965cea3a8faf0ef035e3b3d73b38518081",
       "sourceType": "github",
       "skillPath": "skills/cloudflare/SKILL.md",
-      "computedHash": "ec9de05454b2c5101c92d9e4927065258c090fa5207a106d764f7cc07ed55dbb"
+      "computedHash": "4f0291c3924bb6cfec5311b23cc9798ee0292c055ce88543cf2d2cc3001174f6"
     },
     "effect-ts": {
       "source": "Effect-TS/skills",
@@ -48,7 +48,7 @@
       "ref": "5e95aaebb84541742686e56352b7569acf4306f1",
       "sourceType": "github",
       "skillPath": "feature-sliced-design/SKILL.md",
-      "computedHash": "ffed722f612ca9f9de3f35345c2beb40fb0d56a39391d85f27d6523cf52a07d3"
+      "computedHash": "98d09ea1a9acac34fc5720c610c4ee7c7780dd30b2f287d733961f8e7e9d980b"
     },
     "measure-dont-guess": {
       "source": "./docs/skills/measure-dont-guess",
@@ -121,7 +121,7 @@
       "ref": "602a3690dadd5d620bb21524353b8d192914eabb",
       "sourceType": "github",
       "skillPath": "skills/yomiyasu/SKILL.md",
-      "computedHash": "2331db4c070bdc4edb78a783ccd5d93a85e0c818b330de081ab9b5014d2e3e45"
+      "computedHash": "a3d50b77af3cd0c9c2fdd796ed7a21f0f13d5da91709a5067d168a4a183638a4"
     }
   }
 }
