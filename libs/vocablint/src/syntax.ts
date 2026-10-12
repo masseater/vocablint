@@ -1,9 +1,11 @@
 import { Array as Arr, Option } from "effect";
 import ts from "typescript-6";
 
-const NODE_MODULES_SEGMENT = "/node_modules/";
+import { NODE_MODULES } from "./dependencies.ts";
 
-const LINE_BASE = 1;
+const NODE_MODULES_SEGMENT = `/${NODE_MODULES}/`;
+
+const POSITION_BASE = 1;
 
 const uniqueByReference = <Item>(items: readonly Item[]): readonly Item[] =>
   Arr.dedupeWith(items, (left, right) => left === right);
@@ -73,12 +75,14 @@ const declarationsOf = (symbol: ts.Symbol): readonly ts.Declaration[] =>
 
 const lineOf = (node: ts.Node): number => {
   const sourceFile = node.getSourceFile();
-  return sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + LINE_BASE;
+  return sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + POSITION_BASE;
 };
 
 const columnOf = (node: ts.Node): number => {
   const sourceFile = node.getSourceFile();
-  return sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).character + LINE_BASE;
+  return (
+    sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).character + POSITION_BASE
+  );
 };
 
 const contains =
@@ -88,14 +92,35 @@ const contains =
     outer.getStart() <= inner.getStart() &&
     inner.getEnd() <= outer.getEnd();
 
+const isTypeDeclaration = (
+  declaration: ts.Declaration,
+): declaration is ts.TypeAliasDeclaration | ts.InterfaceDeclaration | ts.EnumDeclaration =>
+  ts.isTypeAliasDeclaration(declaration) ||
+  ts.isInterfaceDeclaration(declaration) ||
+  ts.isEnumDeclaration(declaration);
+
+const isGenericDeclaration = (declaration: ts.Declaration): boolean =>
+  (ts.isTypeAliasDeclaration(declaration) || ts.isInterfaceDeclaration(declaration)) &&
+  Arr.isReadonlyArrayNonEmpty(declaration.typeParameters ?? []);
+
+const propertyNamesOf =
+  (checker: ts.TypeChecker) =>
+  (type: ts.Type): readonly string[] =>
+    checker.getPropertiesOfType(type).map((property) => property.getName());
+
 export {
+  NODE_MODULES_SEGMENT,
+  POSITION_BASE,
   childrenOf,
   columnOf,
   contains,
   declarationsOf,
   descendantsOf,
   isExternalDeclaration,
+  isGenericDeclaration,
+  isTypeDeclaration,
   lineOf,
+  propertyNamesOf,
   referencedSymbols,
   resolvedSymbol,
   symbolAt,

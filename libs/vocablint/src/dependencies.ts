@@ -228,5 +228,5 @@ const dependencyEntries = Effect.fn("dependencyEntries")(function* dependencyEnt
   );
 });
 
-export { dependencyEntries, readManifest, workspaceDependencies };
+export { MANIFEST_FILE, NODE_MODULES, dependencyEntries, readManifest, workspaceDependencies };
 export type { DependencyEntry, Manifest };

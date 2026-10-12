@@ -1,7 +1,13 @@
 import { Array as Arr, Option } from "effect";
 import ts from "typescript-6";
 
-import { childrenOf, declarationsOf, referencedSymbols } from "./syntax.ts";
+import {
+  childrenOf,
+  declarationsOf,
+  isTypeDeclaration,
+  propertyNamesOf,
+  referencedSymbols,
+} from "./syntax.ts";
 import { finiteValuesOf, isSubsetOf, literalUnionOf, schemaTypeOf } from "./values.ts";
 import type { Value } from "./values.ts";
 
@@ -10,11 +16,6 @@ interface ValueSite {
   readonly values: readonly Value[];
   readonly sources: readonly ts.Symbol[];
 }
-
-const isTypeDeclaration = (declaration: ts.Declaration): boolean =>
-  ts.isTypeAliasDeclaration(declaration) ||
-  ts.isInterfaceDeclaration(declaration) ||
-  ts.isEnumDeclaration(declaration);
 
 const namedValuesOf =
   (checker: ts.TypeChecker) =>
@@ -46,13 +47,6 @@ const expressionValuesOf =
     return schemaTypeOf(checker)(type).pipe(Option.flatMap(literalUnionOf));
   };
 
-const propertyNamesOf =
-  (checker: ts.TypeChecker) =>
-  (node: ts.TypeNode): readonly Value[] =>
-    checker
-      .getPropertiesOfType(checker.getTypeFromTypeNode(node))
-      .map((property) => property.getName());
-
 const selectsKeys =
   (checker: ts.TypeChecker) =>
   (node: ts.UnionTypeNode, values: readonly Value[]): boolean => {
@@ -62,7 +56,9 @@ const selectsKeys =
     }
     return (parent.typeArguments ?? [])
       .filter((argument) => argument !== node)
-      .some((argument) => isSubsetOf(values, propertyNamesOf(checker)(argument)));
+      .some((argument) =>
+        isSubsetOf(values, propertyNamesOf(checker)(checker.getTypeFromTypeNode(argument))),
+      );
   };
 
 const unionValuesOf =

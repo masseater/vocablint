@@ -1,5 +1,6 @@
 import { Array as Arr, Order } from "effect";
 
+import { OWNER_TAG } from "./owners.ts";
 import { problemAt } from "./problem.ts";
 import type { Problem } from "./problem.ts";
 import type { ValueSite } from "./sites.ts";
@@ -35,7 +36,7 @@ const duplicateProblems =
             .join(", ");
           return problemAt({
             rule: "duplicate-value-set",
-            message: `The values ${formatValues(site.values)} are also declared at ${others}. Register one owner with @vocablint and derive the others from it.`,
+            message: `The values ${formatValues(site.values)} are also declared at ${others}. Register one owner with @${OWNER_TAG} and derive the others from it.`,
           })(site.node);
         }),
       );

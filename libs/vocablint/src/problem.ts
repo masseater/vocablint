@@ -27,6 +27,8 @@ type Problem = typeof ProblemSchema.Type;
 
 const ProblemList = Schema.Array(ProblemSchema);
 
+const CANDIDATE_LIMIT = 3;
+
 interface Finding {
   readonly rule: RuleName;
   readonly message: string;
@@ -59,10 +61,12 @@ const sortProblems = (problems: readonly Problem[]): readonly Problem[] =>
     problemOrder,
   );
 
+const describeFinding = (problem: Problem): string => `[${problem.rule}] ${problem.message}`;
+
 const formatProblem =
   (relative: (file: string) => string) =>
   (problem: Problem): string =>
-    `${relative(problem.file)}:${String(problem.line)}:${String(problem.column)} [${problem.rule}] ${problem.message}`;
+    `${relative(problem.file)}:${String(problem.line)}:${String(problem.column)} ${describeFinding(problem)}`;
 
-export { ProblemList, formatProblem, problemAt, problemKey, sortProblems };
+export { CANDIDATE_LIMIT, ProblemList, describeFinding, formatProblem, problemAt, sortProblems };
 export type { Finding, Problem, RuleName };

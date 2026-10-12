@@ -10,7 +10,13 @@ import {
 } from "effect";
 import ts from "typescript-6";
 
-import { dependencyEntries, readManifest, workspaceDependencies } from "./dependencies.ts";
+import {
+  MANIFEST_FILE,
+  NODE_MODULES,
+  dependencyEntries,
+  readManifest,
+  workspaceDependencies,
+} from "./dependencies.ts";
 import { libraryIndex } from "./library.ts";
 import type { LibraryIndex } from "./library.ts";
 
@@ -30,8 +36,7 @@ interface PackageInfo {
 
 const CONFIG_FILE = "tsconfig.json";
 const HIDDEN_PREFIX = ".";
-const SKIPPED_DIRECTORIES: ReadonlySet<string> = new Set(["node_modules", "dist", "coverage"]);
-const MANIFEST_FILE = "package.json";
+const SKIPPED_DIRECTORIES: ReadonlySet<string> = new Set([NODE_MODULES, "dist", "coverage"]);
 
 const listConfigFiles = (
   directory: string,

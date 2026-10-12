@@ -1,7 +1,7 @@
 import { Array as Arr, Option } from "effect";
 import ts from "typescript-6";
 
-import { problemAt, problemKey } from "./problem.ts";
+import { problemAt } from "./problem.ts";
 import type { Problem } from "./problem.ts";
 import type { Project } from "./project.ts";
 import { descendantsOf } from "./syntax.ts";
@@ -100,11 +100,11 @@ const ownerOf =
     if (!isModuleConst(node)) {
       return scanned(
         [],
-        [annotationProblem("@vocablint registers an owner only on a module-scope const.")(node)],
+        [annotationProblem(`@${OWNER_TAG} registers an owner only on a module-scope const.`)(node)],
       );
     }
     if (conceptId === "") {
-      return scanned([], [annotationProblem("@vocablint needs a concept id.")(node)]);
+      return scanned([], [annotationProblem(`@${OWNER_TAG} needs a concept id.`)(node)]);
     }
     const values = ownerValuesOf(project.program.getTypeChecker())(node);
     return Option.match(Option.all([values, ownerKeyOf(node)]), {
@@ -166,12 +166,9 @@ const scanOwners = (projects: readonly Project[]): OwnerScan => {
     results.flatMap((result) => result.owners),
     (left, right) => left.key === right.key,
   );
-  const problems = Arr.dedupeWith(
-    [...results.flatMap((result) => result.problems), ...conflictProblems(owners)],
-    (left, right) => problemKey(left) === problemKey(right),
-  );
+  const problems = [...results.flatMap((result) => result.problems), ...conflictProblems(owners)];
   return { owners, problems };
 };
 
-export { ownerKeyOf, scanOwners };
+export { OWNER_TAG, ownerKeyOf, scanOwners };
 export type { Owner, OwnerScan };

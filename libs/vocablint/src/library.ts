@@ -2,7 +2,12 @@ import { Array as Arr, Option } from "effect";
 import ts from "typescript-6";
 
 import type { DependencyEntry } from "./dependencies.ts";
-import { declarationsOf, resolvedSymbol } from "./syntax.ts";
+import {
+  declarationsOf,
+  isGenericDeclaration,
+  isTypeDeclaration,
+  resolvedSymbol,
+} from "./syntax.ts";
 import { schemaTypeOf, vocabularyOf } from "./values.ts";
 import type { Vocabulary } from "./values.ts";
 
@@ -52,16 +57,8 @@ const isObjectType =
     checker.getApparentType(type) === type &&
     Arr.isReadonlyArrayNonEmpty(checker.getPropertiesOfType(type));
 
-const isTypeDeclaration = (
-  declaration: ts.Declaration,
-): declaration is ts.TypeAliasDeclaration | ts.InterfaceDeclaration | ts.EnumDeclaration =>
-  ts.isTypeAliasDeclaration(declaration) ||
-  ts.isInterfaceDeclaration(declaration) ||
-  ts.isEnumDeclaration(declaration);
-
-const isGenericDeclaration = (declaration: ts.Declaration): boolean =>
-  (ts.isTypeAliasDeclaration(declaration) || ts.isInterfaceDeclaration(declaration)) &&
-  Arr.isReadonlyArrayNonEmpty(declaration.typeParameters ?? []);
+const describeLibraryType = (type: LibraryType): string =>
+  `${type.typeName} from ${type.specifier}`;
 
 const libraryType = (walk: Walk, typeName: string, declaration: ts.Declaration): LibraryType => ({
   specifier: walk.entry.specifier,
@@ -170,5 +167,5 @@ const libraryIndex =
   (entries: readonly DependencyEntry[]): LibraryIndex =>
     mergeIndexes(entries.map((entry) => indexOfEntry(program)(entry)));
 
-export { isObjectType, libraryIndex };
+export { describeLibraryType, isObjectType, libraryIndex };
 export type { LibraryIndex, LibraryShape, LibraryType, LibraryVocabulary };
