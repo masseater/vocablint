@@ -33,12 +33,6 @@ lint・fmt・checkだけは、Vite+の仕様によりルートの単一設定と
 FSDはコロケーションが本質である。使われる場所の近くに置き、再利用されるまで切り出さない。
 定数・設定値・スキーマ・ルールのIDは一か所で定義し、ほかの場所はimportか導出で参照する。同じ値を書き写さない。
 
-## Alchemy
-
-Alchemy のリソース定義に足りない設定があるときは、alchemy にパッチを当てず、公式の拡張手段であるカスタムリソースを定義する。
-アプリ名は `apps/web/app-name.ts` の `APP_NAME` だけで定義する。スタック名に `APP_NAME` を渡し、スタックの最後で `requireAppPrefix` を `yield*` する。名前を明示するリソースは `APP_NAME-` で始める。守らなければ ESLint か実行時検査が落とす。
-`APP_NAME` を変えると別のスタックになり、リソースは作り直される。
-
 ## パッケージマネージャー
 
 pnpmは直接実行せず、`vp install`・`vp add`・`vp exec`・`vp dlx`・`vp pm`を使う。

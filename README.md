@@ -1,25 +1,25 @@
 # vocablint
 
-有限の値の集合とオブジェクトの形を、それを既に持っている場所から導かせる検査ツールである。
-持ち主は、リポジトリ内で登録した定数か、依存パッケージの型である。
-判定は TypeScript の型検査器だけで行い、AI の判定は使わない。
+vocablint makes every finite value set and object shape derive from the place that already owns it.
+An owner is either a constant registered in the repository or a type exported by a dependency.
+Checks run on the TypeScript type checker alone; no AI is involved.
 
-## 使い方
+## Usage
 
-リポジトリのルートで CLI を実行する。
-ルール違反を見つけると終了コード 1 で終わる。
+Run the CLI at the repository root.
+It exits with code 1 when it finds a violation.
 
 ```sh
 vp exec vocablint
 vp exec vocablint --json
 ```
 
-配下の tsconfig.json をすべて見つけ、それぞれをひとつのプロジェクトとして型検査する。
-先頭に `// @ts-nocheck` を書いたファイルは、型検査の対象外なので検査しない。
+vocablint finds every tsconfig.json under the root and type-checks each one as a project.
+Files that start with `// @ts-nocheck` are skipped because they are not type-checked.
 
-## 持ち主の登録
+## Registering an owner
 
-モジュールのトップレベルの `const` に `@vocablint` タグと概念の ID を付ける。
+Add the `@vocablint` tag and a concept ID to a top-level `const` in a module.
 
 ```ts
 /** @vocablint sort-order */
@@ -27,24 +27,24 @@ const SORT_ORDERS = ["asc", "desc"] as const;
 type SortOrder = (typeof SORT_ORDERS)[number];
 ```
 
-## ルール
+## Rules
 
-| ルール                | 落とすもの                                                                 |
-| --------------------- | -------------------------------------------------------------------------- |
-| `owner-value-set`     | 登録した持ち主の値を書き直した集合                                         |
-| `owner-extension`     | 持ち主から導いたうえで値を足した集合                                       |
-| `owned-literal`       | 持ち主から導いた型の位置に直接書いたリテラル                               |
-| `library-value-set`   | 依存パッケージの型の値を書き直した集合                                     |
-| `library-shape`       | 依存パッケージのオブジェクト型を写した interface・型・スキーマ（3 個以上） |
-| `duplicate-value-set` | 持ち主のない同じ値の集合が複数の場所にあること                             |
-| `owner-annotation`    | `@vocablint` タグの付け方の誤り                                            |
+| Rule                  | Reports                                                                                 |
+| --------------------- | --------------------------------------------------------------------------------------- |
+| `owner-value-set`     | A set that restates a registered owner's values                                         |
+| `owner-extension`     | A set derived from an owner with extra values added                                     |
+| `owned-literal`       | A literal written directly where a type derived from an owner is expected               |
+| `library-value-set`   | A set that restates the values of a dependency's type                                   |
+| `library-shape`       | An interface, type or schema that copies a dependency's object type (3 or more members) |
+| `duplicate-value-set` | The same unowned value set declared in more than one place                              |
+| `owner-annotation`    | A misplaced or malformed `@vocablint` tag                                               |
 
-Effect Schema の `Schema.Literals` や `Schema.Struct` も、型の書き換えと同じに扱う。
+Effect Schema's `Schema.Literals` and `Schema.Struct` are treated the same as the equivalent types.
 
-## oxlint プラグイン
+## oxlint plugin
 
-CLI の結果をファイルごとに oxlint へ出す。
-判定は CLI が行い、プラグインはその結果を読むだけである。
+The plugin reports the CLI's results to oxlint, file by file.
+The CLI does the checking; the plugin only reads its output.
 
 ```ts
 export default defineConfig({
@@ -55,37 +55,24 @@ export default defineConfig({
 });
 ```
 
-## 開発
-
-## セットアップ
+## Development
 
 ```sh
 vp install
 cp .env.example .env
-vp exec --filter web alchemy profile edit --add Cloudflare
 vp run verify
 ```
 
-Cloudflare の認証情報は環境変数ではなく Alchemy のプロファイル（`~/.alchemy`）で管理する。
-デプロイと `.mcp.json` の Cloudflare MCP は、どちらもこのプロファイルの認証情報を使う。
+### Environment variables
 
-## 環境変数
+Put them in `.env` at the root.
 
-ルートの `.env` に書く。
+| Name                 | Used for                                                 |
+| -------------------- | -------------------------------------------------------- |
+| `OPENROUTER_API_KEY` | oxlint-plugin-decision checks that run during `vp check` |
 
-| 名前                 | 用途                                            |
-| -------------------- | ----------------------------------------------- |
-| `OPENROUTER_API_KEY` | `vp check` で走る oxlint-plugin-decision の判定 |
+### GitHub settings
 
-## GitHub の設定
-
-Actions の secrets、Actions による PR 作成の許可、PR を作れる人の制限、既定ブランチのルールセットを gh で設定する。
-手順は `setup-github` スキル（[masseater/skills](https://github.com/masseater/skills)）にある。
-
-## 起動とデプロイ
-
-```sh
-cd apps/web
-vp run dev
-vp run deploy
-```
+Configure the GitHub side with gh.
+This covers secrets, pull requests by Actions, who may open pull requests, and the branch ruleset.
+The steps are in the `setup-github` skill ([masseater/skills](https://github.com/masseater/skills)).
