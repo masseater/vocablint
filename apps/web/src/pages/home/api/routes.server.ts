@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 
+import { FeatureFlags } from "#/pages/home/config/feature-flags.server";
 import { todo } from "#/pages/home/model/todo.table";
 import { createRouter } from "#/shared/api/index.server";
 import { db } from "#/shared/db/index.server";
-import { FeatureFlags } from "#/shared/flags/index.server";
 
 import { runRequest } from "./runtime.server";
 

@@ -8,6 +8,7 @@ import {
   declarationsOf,
   descendantsOf,
   isExternalDeclaration,
+  NODE_MODULES_SEGMENT,
   symbolAt,
 } from "./syntax.ts";
 import { isSubsetOf, vocabularyOf } from "./values.ts";
@@ -23,7 +24,6 @@ interface FlowContext {
   readonly sites: readonly ValueSite[];
 }
 
-const NODE_MODULES_SEGMENT = "/node_modules/";
 const SCOPE_PREFIX = "@";
 const SCOPED_SEGMENTS = 2;
 const UNSCOPED_SEGMENTS = 1;

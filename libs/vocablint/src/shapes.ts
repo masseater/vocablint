@@ -1,11 +1,16 @@
 import { Array as Arr, Option, Order } from "effect";
 import ts from "typescript-6";
 
-import { isObjectType } from "./library.ts";
+import { describeLibraryType, isObjectType } from "./library.ts";
 import type { LibraryShape } from "./library.ts";
-import { problemAt } from "./problem.ts";
+import { CANDIDATE_LIMIT, problemAt } from "./problem.ts";
 import type { Problem } from "./problem.ts";
-import { descendantsOf, referencedSymbols } from "./syntax.ts";
+import {
+  descendantsOf,
+  isGenericDeclaration,
+  propertyNamesOf,
+  referencedSymbols,
+} from "./syntax.ts";
 import { schemaTypeOf } from "./values.ts";
 
 interface ShapeContext {
@@ -24,19 +29,13 @@ interface ShapeMatch {
 }
 
 const MINIMUM_SHAPE_PROPERTIES = 3;
-const CANDIDATE_LIMIT = 3;
 const EXACT = 0;
 
-const isGeneric = (typeParameters: readonly ts.Node[] | undefined): boolean =>
-  Arr.isReadonlyArrayNonEmpty(typeParameters ?? []);
-
 const isPlainInterface = (node: ts.Node): node is ts.InterfaceDeclaration =>
-  ts.isInterfaceDeclaration(node) && !isGeneric(node.typeParameters);
+  ts.isInterfaceDeclaration(node) && !isGenericDeclaration(node);
 
 const isPlainTypeLiteral = (node: ts.Node): node is ts.TypeAliasDeclaration =>
-  ts.isTypeAliasDeclaration(node) &&
-  !isGeneric(node.typeParameters) &&
-  ts.isTypeLiteralNode(node.type);
+  ts.isTypeAliasDeclaration(node) && !isGenericDeclaration(node) && ts.isTypeLiteralNode(node.type);
 
 const isDeclaredShape = (
   node: ts.Node,
@@ -77,9 +76,6 @@ const shapeSitesIn =
       ),
     );
 
-const propertyNames = (checker: ts.TypeChecker, type: ts.Type): readonly string[] =>
-  checker.getPropertiesOfType(type).map((property) => property.getName());
-
 const sameProperty =
   (checker: ts.TypeChecker) =>
   (local: ts.Symbol, library: ts.Symbol): boolean => {
@@ -106,7 +102,10 @@ const matchOf =
     if (!matches) {
       return Option.none();
     }
-    return Option.some({ shape, extra: propertyNames(checker, shape.type).length - locals.length });
+    return Option.some({
+      shape,
+      extra: propertyNamesOf(checker)(shape.type).length - locals.length,
+    });
   };
 
 const isDerivedFrom =
@@ -118,12 +117,9 @@ const isDerivedFrom =
 
 const matchOrder = Order.mapInput(Order.Number, (match: ShapeMatch) => match.extra);
 
-const describeMatch = (match: ShapeMatch): string =>
-  `${match.shape.typeName} from ${match.shape.specifier}`;
-
 const shapeProblem = (site: ShapeSite, matches: readonly ShapeMatch[]): Problem => {
   const shown = Arr.take(matches, CANDIDATE_LIMIT)
-    .map((match) => describeMatch(match))
+    .map((match) => describeLibraryType(match.shape))
     .join(", ");
   const advice = Option.match(
     Arr.findFirst(matches, (match) => match.extra === EXACT),
@@ -141,7 +137,7 @@ const shapeProblem = (site: ShapeSite, matches: readonly ShapeMatch[]): Problem 
 const shapeProblemOf =
   (context: ShapeContext) =>
   (site: ShapeSite): Option.Option<Problem> => {
-    const names = propertyNames(context.checker, site.type);
+    const names = propertyNamesOf(context.checker)(site.type);
     if (names.length < MINIMUM_SHAPE_PROPERTIES) {
       return Option.none();
     }

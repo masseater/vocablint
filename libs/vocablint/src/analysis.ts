@@ -9,7 +9,7 @@ import type { Project } from "./project.ts";
 import { shapeProblemsIn } from "./shapes.ts";
 import { sitesUnder } from "./sites.ts";
 import type { ValueSite } from "./sites.ts";
-import { descendantsOf } from "./syntax.ts";
+import { contains, descendantsOf } from "./syntax.ts";
 import { ownedLiteralProblems, siteVerdict } from "./value-checks.ts";
 
 interface ProjectAnalysis {
@@ -44,12 +44,7 @@ const ownerDeclarationsIn = (
 const isInside =
   (outers: readonly ts.Node[]) =>
   (node: ts.Node): boolean =>
-    outers.some(
-      (outer) =>
-        outer.getSourceFile() === node.getSourceFile() &&
-        outer.getStart() <= node.getStart() &&
-        node.getEnd() <= outer.getEnd(),
-    );
+    outers.some((outer) => contains(outer)(node));
 
 const analyzeProject =
   (owners: readonly Owner[]) =>

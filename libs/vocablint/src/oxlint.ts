@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 
 import { Option, Schema } from "effect";
 
+import { JSON_FLAG } from "./cli-contract.ts";
 import { vocablintPlugin } from "./oxlint-rule.ts";
 import { ProblemList } from "./problem.ts";
 import type { Problem } from "./problem.ts";
@@ -13,7 +14,7 @@ const loaded = new Map<string, readonly Problem[]>();
 
 const runCli = (cwd: string): readonly Problem[] =>
   decodeProblems(
-    execFileSync(process.execPath, [CLI_PATH, "--json"], {
+    execFileSync(process.execPath, [CLI_PATH, JSON_FLAG], {
       cwd,
       encoding: "utf8",
       maxBuffer: Number.MAX_SAFE_INTEGER,

@@ -1,14 +1,14 @@
 import type { Diagnostic, Plugin, Rule } from "vite-plus/lint/plugins";
 
+import { describeFinding } from "./problem.ts";
 import type { Problem } from "./problem.ts";
+import { POSITION_BASE } from "./syntax.ts";
 
 type ProblemLoader = (cwd: string) => readonly Problem[];
 
-const COLUMN_BASE = 1;
-
 const diagnosticOf = (problem: Problem): Diagnostic => ({
-  message: `[${problem.rule}] ${problem.message}`,
-  loc: { start: { line: problem.line, column: problem.column - COLUMN_BASE } },
+  message: describeFinding(problem),
+  loc: { start: { line: problem.line, column: problem.column - POSITION_BASE } },
 });
 
 const vocabularyRule = (load: ProblemLoader): Rule => ({

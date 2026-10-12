@@ -8,7 +8,7 @@ class FeatureFlags extends Context.Service<
   {
     readonly getBoolean: (key: string, defaultValue: boolean) => Effect.Effect<boolean>;
   }
->()("web/shared/flags/feature-flags.server/FeatureFlags") {}
+>()("web/pages/home/config/feature-flags.server/FeatureFlags") {}
 
 const featureFlagsLive = Layer.effect(
   FeatureFlags,

@@ -8,7 +8,12 @@ import baselineJs from "eslint-plugin-baseline-js";
 import reactHooks from "eslint-plugin-react-hooks";
 import { defineConfig } from "vite-plus";
 
-import { generated, restrictedImports } from "./lint.config.ts";
+import {
+  decisionPluginName,
+  decisionRuleNames,
+  generated,
+  restrictedImports,
+} from "./lint.config.ts";
 
 type Rules = Readonly<Record<string, "error">>;
 
@@ -30,11 +35,7 @@ const eslintReactRules = asErrors(
   ),
 );
 
-const decisionRules = asErrors(
-  ["exclusive-status", "server-state-tanstack-query", "ui-state-effect-atom"].map(
-    (id) => `stack/${id}`,
-  ),
-);
+const decisionRules = asErrors(decisionRuleNames);
 
 const effectRules = asErrors(
   Object.values(effectPresets).flatMap((preset) => Object.keys(preset.rules ?? {})),
@@ -86,7 +87,7 @@ export default defineConfig({
       { name: "no-comments", specifier: "eslint-plugin-no-comments" },
       { name: "baseline-js", specifier: "eslint-plugin-baseline-js" },
       { name: "@html-eslint/react", specifier: "@html-eslint/eslint-plugin-react" },
-      { name: "stack", specifier: "./decision-rules.ts" },
+      { name: decisionPluginName, specifier: "./decision-rules.ts" },
     ],
     rules: {
       "vite-plus/prefer-vite-plus-imports": "error",
@@ -203,7 +204,7 @@ export default defineConfig({
       },
     ],
     settings: {
-      stack: { model: "openrouter/perplexity/pplx-decider-v1.1-27b" },
+      [decisionPluginName]: { model: "openrouter/perplexity/pplx-decider-v1.1-27b" },
     },
     options: {
       typeAware: true,

@@ -2,10 +2,11 @@ import { Array as Arr, Option } from "effect";
 import ts from "typescript-6";
 
 import type { Flow } from "./flows.ts";
+import { describeLibraryType } from "./library.ts";
 import type { LibraryVocabulary } from "./library.ts";
 import { ownerKeyOf } from "./owners.ts";
 import type { Owner } from "./owners.ts";
-import { problemAt } from "./problem.ts";
+import { CANDIDATE_LIMIT, problemAt } from "./problem.ts";
 import type { Problem } from "./problem.ts";
 import type { ValueSite } from "./sites.ts";
 import { contextSymbolsOf } from "./slots.ts";
@@ -31,7 +32,6 @@ interface SiteVerdict {
 }
 
 const OWNER_SEARCH_DEPTH = 4;
-const CANDIDATE_LIMIT = 3;
 const NOTHING_HIDDEN = 0;
 
 const directOwners =
@@ -100,7 +100,7 @@ const libraryCandidates =
     return Arr.dedupe(
       context.vocabularies
         .filter((library) => isSubsetOf(site.values, library.vocabulary.values))
-        .map((library) => `${library.typeName} from ${library.specifier}`),
+        .map((library) => describeLibraryType(library)),
     );
   };
 

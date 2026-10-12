@@ -48,10 +48,10 @@
   "dependencies": {
     "@effect/platform-node": "catalog:",
     "effect": "catalog:stack",
-    "typescript-6": "npm:@typescript/typescript6@6.0.2"
+    "typescript-6": "catalog:"
   },
   "devDependencies": {
-    "@effect/vitest": "4.0.0",
+    "@effect/vitest": "catalog:",
     "@types/node": "catalog:",
     "typescript": "catalog:stack",
     "vite-plus": "catalog:stack",
