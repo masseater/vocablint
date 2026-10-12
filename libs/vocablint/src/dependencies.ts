@@ -1,0 +1,232 @@
+import { Array as Arr, Effect, FileSystem, Option, Order, Path, Predicate, Schema } from "effect";
+
+interface DependencyEntry {
+  readonly packageName: string;
+  readonly specifier: string;
+  readonly declarationsPath: string;
+}
+
+const DependencyMap = Schema.optional(Schema.Record(Schema.String, Schema.String));
+
+const PackageManifest = Schema.Struct({
+  name: Schema.optional(Schema.String),
+  dependencies: DependencyMap,
+  devDependencies: DependencyMap,
+  peerDependencies: DependencyMap,
+  exports: Schema.optional(Schema.Unknown),
+  types: Schema.optional(Schema.String),
+  typings: Schema.optional(Schema.String),
+  main: Schema.optional(Schema.String),
+});
+
+type Manifest = typeof PackageManifest.Type;
+
+const MANIFEST_FILE = "package.json";
+const NODE_MODULES = "node_modules";
+const WORKSPACE_PROTOCOL = "workspace:";
+const ROOT_SUBPATH = ".";
+const SUBPATH_PREFIX = "./";
+const WILDCARD = "*";
+const TYPES_CONDITION = "types";
+const TYPES_SCOPE = "@types/";
+const TYPES_SCOPE_SEPARATOR = "__";
+const CONDITION_DEPTH_LIMIT = 8;
+const ROOT_DEPTH = 0;
+const DEPTH_STEP = 1;
+const DECLARATIONS_SUFFIX = /\.d\.[cm]?ts$|\.[cm]?tsx?$/u;
+const SCRIPT_SUFFIX = /\.(?<module>[cm]?)js$/u;
+
+const readManifest = Effect.fn("readManifest")(function* readManifest(directory: string) {
+  const fs = yield* FileSystem.FileSystem;
+  const path = yield* Path.Path;
+  const text = yield* fs.readFileString(path.join(directory, MANIFEST_FILE));
+  return yield* Schema.decodeEffect(Schema.fromJsonString(PackageManifest))(text);
+}, Effect.option);
+
+const conditionsOf = (held: unknown): readonly (readonly [string, unknown])[] => {
+  if (!Predicate.isObject(held)) {
+    return [];
+  }
+  return Object.entries(held);
+};
+
+const typesConditionIn = (held: unknown, depth: number): Option.Option<string> => {
+  if (depth > CONDITION_DEPTH_LIMIT) {
+    return Option.none();
+  }
+  const entries = conditionsOf(held);
+  const declared = Arr.findFirst(entries, ([condition, target]) =>
+    Option.liftPredicate(
+      target,
+      (candidate) => condition === TYPES_CONDITION && Predicate.isString(candidate),
+    ),
+  ).pipe(Option.filter(Predicate.isString));
+  return Option.orElse(declared, () =>
+    Arr.findFirst(entries, ([, nested]) => typesConditionIn(nested, depth + DEPTH_STEP)),
+  );
+};
+
+const anyConditionIn = (held: unknown, depth: number): Option.Option<string> => {
+  if (Predicate.isString(held)) {
+    return Option.some(held);
+  }
+  if (depth > CONDITION_DEPTH_LIMIT) {
+    return Option.none();
+  }
+  return Arr.findFirst(conditionsOf(held), ([, nested]) =>
+    anyConditionIn(nested, depth + DEPTH_STEP),
+  );
+};
+
+const targetPathsOf = (target: unknown): readonly string[] =>
+  Arr.getSomes([typesConditionIn(target, ROOT_DEPTH), anyConditionIn(target, ROOT_DEPTH)]);
+
+interface SubpathTarget {
+  readonly subpath: string;
+  readonly target: unknown;
+}
+
+const subpathTargetsOf = (exportsField: unknown): readonly SubpathTarget[] => {
+  if (Predicate.isString(exportsField)) {
+    return [{ subpath: ROOT_SUBPATH, target: exportsField }];
+  }
+  const entries = conditionsOf(exportsField);
+  if (!entries.some(([subpath]) => subpath.startsWith(ROOT_SUBPATH))) {
+    return Arr.match(entries, {
+      onEmpty: () => [],
+      onNonEmpty: () => [{ subpath: ROOT_SUBPATH, target: exportsField }],
+    });
+  }
+  return entries
+    .filter(([subpath]) => subpath === ROOT_SUBPATH || subpath.startsWith(SUBPATH_PREFIX))
+    .filter(([subpath]) => !subpath.includes(WILDCARD))
+    .map(([subpath, target]) => ({ subpath, target }));
+};
+
+const declarationsCandidateFor = (entryPath: string): Option.Option<string> => {
+  if (DECLARATIONS_SUFFIX.test(entryPath)) {
+    return Option.some(entryPath);
+  }
+  if (!SCRIPT_SUFFIX.test(entryPath)) {
+    return Option.none();
+  }
+  return Option.some(entryPath.replace(SCRIPT_SUFFIX, ".d.$<module>ts"));
+};
+
+const firstDeclarationsAmong = Effect.fn("firstDeclarationsAmong")(function* firstDeclarations(
+  directory: string,
+  entryPaths: readonly string[],
+) {
+  const fs = yield* FileSystem.FileSystem;
+  const path = yield* Path.Path;
+  const candidates = Arr.getSomes(
+    entryPaths.map((entryPath) => declarationsCandidateFor(entryPath)),
+  );
+  const existing = yield* Effect.filter(
+    candidates.map((candidate) => path.join(directory, candidate)),
+    (candidate) => fs.exists(candidate).pipe(Effect.orElseSucceed(() => false)),
+  );
+  return Arr.head(existing);
+});
+
+const importNameOf = (packageName: string): string => {
+  if (!packageName.startsWith(TYPES_SCOPE)) {
+    return packageName;
+  }
+  const unscoped = packageName.slice(TYPES_SCOPE.length);
+  if (!unscoped.includes(TYPES_SCOPE_SEPARATOR)) {
+    return unscoped;
+  }
+  return `@${unscoped.replace(TYPES_SCOPE_SEPARATOR, "/")}`;
+};
+
+const specifierFor = (packageName: string, subpath: string): string => {
+  const importName = importNameOf(packageName);
+  if (subpath === ROOT_SUBPATH) {
+    return importName;
+  }
+  return `${importName}/${subpath.slice(SUBPATH_PREFIX.length)}`;
+};
+
+const rootEntryPaths = (manifest: Manifest): readonly string[] =>
+  Arr.getSomes([
+    Option.fromUndefinedOr(manifest.types),
+    Option.fromUndefinedOr(manifest.typings),
+    Option.fromUndefinedOr(manifest.main),
+  ]);
+
+const subpathEntriesOf = Effect.fn("subpathEntriesOf")(function* subpathEntriesOf(
+  packageName: string,
+  directory: string,
+  manifest: Manifest,
+) {
+  const found = yield* Effect.forEach(subpathTargetsOf(manifest.exports), ({ subpath, target }) =>
+    firstDeclarationsAmong(directory, targetPathsOf(target)).pipe(
+      Effect.map(
+        Option.map((declarationsPath) => ({
+          packageName,
+          specifier: specifierFor(packageName, subpath),
+          declarationsPath,
+        })),
+      ),
+    ),
+  );
+  return Arr.getSomes(found);
+});
+
+const entriesOfDependency = Effect.fn("entriesOfDependency")(function* entriesOfDependency(
+  packageName: string,
+  directory: string,
+) {
+  const manifest = yield* readManifest(directory);
+  if (Option.isNone(manifest)) {
+    return [];
+  }
+  const subpathEntries = yield* subpathEntriesOf(packageName, directory, manifest.value);
+  const rootSpecifier = specifierFor(packageName, ROOT_SUBPATH);
+  if (subpathEntries.some((entry) => entry.specifier === rootSpecifier)) {
+    return subpathEntries;
+  }
+  const rootDeclarations = yield* firstDeclarationsAmong(directory, rootEntryPaths(manifest.value));
+  const rootEntries = rootDeclarations.pipe(
+    Option.map((declarationsPath) => ({ packageName, specifier: rootSpecifier, declarationsPath })),
+    Option.toArray,
+  );
+  return [...rootEntries, ...subpathEntries];
+});
+
+const declaredDependencies = (manifest: Manifest): readonly string[] =>
+  Object.entries({
+    ...manifest.dependencies,
+    ...manifest.devDependencies,
+    ...manifest.peerDependencies,
+  })
+    .filter(([, range]) => !range.startsWith(WORKSPACE_PROTOCOL))
+    .map(([packageName]) => packageName);
+
+const workspaceDependencies = (manifest: Manifest): readonly string[] =>
+  Object.entries({ ...manifest.dependencies, ...manifest.devDependencies })
+    .filter(([, range]) => range.startsWith(WORKSPACE_PROTOCOL))
+    .map(([packageName]) => packageName);
+
+const entryOrder = Order.mapInput(Order.String, (entry: DependencyEntry) => entry.specifier);
+
+const dependencyEntries = Effect.fn("dependencyEntries")(function* dependencyEntries(
+  packageDirectory: string,
+) {
+  const path = yield* Path.Path;
+  const manifest = yield* readManifest(packageDirectory);
+  if (Option.isNone(manifest)) {
+    return [];
+  }
+  const entries = yield* Effect.forEach(declaredDependencies(manifest.value), (packageName) =>
+    entriesOfDependency(packageName, path.join(packageDirectory, NODE_MODULES, packageName)),
+  );
+  return Arr.sort(
+    Arr.dedupeWith(entries.flat(), (left, right) => left.specifier === right.specifier),
+    entryOrder,
+  );
+});
+
+export { dependencyEntries, readManifest, workspaceDependencies };
+export type { DependencyEntry, Manifest };
