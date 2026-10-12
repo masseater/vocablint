@@ -7,8 +7,6 @@ import { findingsIn } from "./repository.test.support.ts";
 
 const WITH_EFFECT = JSON.stringify({ name: "fixture", dependencies: { effect: "4.0.0" } });
 
-const SCHEMA_TIMEOUT = 30_000;
-
 const readsLiteralSetsFromSchemaLiteralsAndUni = Effect.gen(
   function* readsLiteralSetsFromSchemaLiteralsAndUni() {
     const findings = yield* findingsIn({
@@ -47,15 +45,10 @@ const acceptsSchemasBuiltFromTheOwner = Effect.gen(function* acceptsSchemasBuilt
   expect(findings).toStrictEqual([]);
 });
 
-layer(NodeServices.layer, { timeout: SCHEMA_TIMEOUT })("Effect Schema", (it) => {
+layer(NodeServices.layer)("Effect Schema", (it) => {
   it.effect(
     "reads literal sets from Schema.Literals and unions of Schema.Literal",
     () => readsLiteralSetsFromSchemaLiteralsAndUni,
-    SCHEMA_TIMEOUT,
   );
-  it.effect(
-    "accepts schemas built from the owner",
-    () => acceptsSchemasBuiltFromTheOwner,
-    SCHEMA_TIMEOUT,
-  );
+  it.effect("accepts schemas built from the owner", () => acceptsSchemasBuiltFromTheOwner);
 });
