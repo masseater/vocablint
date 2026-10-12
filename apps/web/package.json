@@ -39,6 +39,7 @@
     "eden-tanstack-react-query": "catalog:stack",
     "effect": "catalog:stack",
     "elysia": "catalog:stack",
+    "jose": "catalog:",
     "radix-ui": "catalog:stack",
     "react": "19.3.0",
     "react-dom": "19.3.0",

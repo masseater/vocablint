@@ -166,7 +166,7 @@ export default defineConfig({
         "error",
         {
           capIsNewExceptions: ["CloudflareApiLive", "Stack"],
-          capIsNewExceptionPattern: "^(Config|Context|Data|Schema|D1|Website)\\.",
+          capIsNewExceptionPattern: "^(Config|Context|Data|Schema|D1|Website|Workers)\\.",
         },
       ],
       "typescript/no-empty-interface": ["error", { allowSingleExtends: true }],
@@ -176,7 +176,7 @@ export default defineConfig({
     },
     overrides: [
       {
-        files: ["**/*.config.ts", "**/alchemy.run.ts", "decision-rules.ts"],
+        files: ["**/*.config.ts", "**/alchemy.run.ts", "**/*.worker.ts", "decision-rules.ts"],
         rules: { "import/no-default-export": "off" },
       },
       {

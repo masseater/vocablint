@@ -106,16 +106,24 @@ jobs:
               echo "::warning::Could not open a pull request; open one from $BRANCH manually"
           fi
 
-  otel:
+  ci-telemetry:
     needs: [autofix]
-    if: always() && vars.OTEL_EXPORTER_OTLP_ENDPOINT != ''
+    if: always()
     runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: read
+      id-token: write
     steps:
-      - uses: dash0hq/otel-cicd-action@4826b79d63662fa91657272e7711420cb6aea543 # v4.2.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          otlpEndpoint: ${{ startsWith(vars.OTEL_EXPORTER_OTLP_ENDPOINT, 'http') && format('{0}/v1/traces', vars.OTEL_EXPORTER_OTLP_ENDPOINT) || vars.OTEL_EXPORTER_OTLP_ENDPOINT }}
-          otlpHeaders: ${{ secrets.OTEL_EXPORTER_OTLP_HEADERS }}
-          githubToken: ${{ github.token }}
+          persist-credentials: false
+          sparse-checkout: |
+            .github/scripts/ci-telemetry.sh
+            apps/web/app-name.ts
+          sparse-checkout-cone-mode: false
+      - run: .github/scripts/ci-telemetry.sh
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
