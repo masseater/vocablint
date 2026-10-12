@@ -15,7 +15,7 @@ const readsLiteralSetsFromSchemaLiteralsAndUni = Effect.gen(
       "package.json": WITH_EFFECT,
       "src/a.ts": [
         'import { Schema } from "effect";',
-        "/** @canonical-values order.status */",
+        "/** @vocablint order.status */",
         'export const OrderStatus = Schema.Literals(["draft", "published"]);',
         'export const Restated = Schema.Literals(["draft", "published"]);',
         'export const Unioned = Schema.Union([Schema.Literal("a"), Schema.Literal("b")]);',
@@ -36,7 +36,7 @@ const acceptsSchemasBuiltFromTheOwner = Effect.gen(function* acceptsSchemasBuilt
     "package.json": WITH_EFFECT,
     "src/a.ts": [
       'import { Schema } from "effect";',
-      "/** @canonical-values order.status */",
+      "/** @vocablint order.status */",
       'export const OrderStatus = Schema.Literals(["draft", "published"]);',
       "export const Spread = Schema.Literals([...OrderStatus.literals]);",
       'export const Titled = OrderStatus.annotate({ title: "status" });',

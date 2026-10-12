@@ -6,7 +6,7 @@ import { expect } from "vite-plus/test";
 import { findingsIn } from "./repository.test.support.ts";
 
 const STATUS_OWNER = [
-  "/** @canonical-values order.status */",
+  "/** @vocablint order.status */",
   'export const ORDER_STATUSES = ["draft", "published", "archived"] as const;',
   "export type OrderStatus = (typeof ORDER_STATUSES)[number];",
   "",
@@ -51,17 +51,17 @@ const reportsAnnotationsThatCannotRegisterAnOw = Effect.gen(
   function* reportsAnnotationsThatCannotRegisterAnOw() {
     const findings = yield* findingsIn({
       "src/owners.ts": [
-        "/** @canonical-values */",
+        "/** @vocablint */",
         'export const NAMELESS = ["a", "b"] as const;',
-        "/** @canonical-values letters */",
+        "/** @vocablint letters */",
         "export const COUNT = 1;",
-        "/** @canonical-values letters */",
+        "/** @vocablint letters */",
         'export type Letter = "a" | "b";',
-        "/** @canonical-values colors */",
+        "/** @vocablint colors */",
         'export const COLORS = ["red", "blue"] as const;',
-        "/** @canonical-values colors */",
+        "/** @vocablint colors */",
         'export const HUES = ["green", "cyan"] as const;',
-        "/** @canonical-values tones */",
+        "/** @vocablint tones */",
         'export const TONES = ["red", "blue"] as const;',
         "",
       ].join("\n"),

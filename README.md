@@ -19,10 +19,10 @@ vp exec vocablint --json
 
 ## 持ち主の登録
 
-モジュールのトップレベルの `const` に `@canonical-values` タグと概念の ID を付ける。
+モジュールのトップレベルの `const` に `@vocablint` タグと概念の ID を付ける。
 
 ```ts
-/** @canonical-values sort-order */
+/** @vocablint sort-order */
 const SORT_ORDERS = ["asc", "desc"] as const;
 type SortOrder = (typeof SORT_ORDERS)[number];
 ```
@@ -37,7 +37,7 @@ type SortOrder = (typeof SORT_ORDERS)[number];
 | `library-value-set`   | 依存パッケージの型の値を書き直した集合                                     |
 | `library-shape`       | 依存パッケージのオブジェクト型を写した interface・型・スキーマ（3 個以上） |
 | `duplicate-value-set` | 持ち主のない同じ値の集合が複数の場所にあること                             |
-| `owner-annotation`    | `@canonical-values` タグの付け方の誤り                                     |
+| `owner-annotation`    | `@vocablint` タグの付け方の誤り                                            |
 
 Effect Schema の `Schema.Literals` や `Schema.Struct` も、型の書き換えと同じに扱う。
 
