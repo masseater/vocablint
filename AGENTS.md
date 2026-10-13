@@ -38,65 +38,37 @@ release. Add a tool name to select part of the graph. For example, run
 
 <!--VITE PLUS END-->
 
-## 環境変数と認証
+## 環境変数
 
-- 環境変数は必要最小限にする。環境変数が一つ増えるだけで、どの環境で何を設定するかという考慮事項が爆発的に増えるためである。
-- 環境変数にしてよいのは、設定や認証に限らず、本当に環境ごとに変わる値だけである。環境で変わらない値はコードや Alchemy の設定に書き、ツールにフラグがあればフラグを使う。
-- Cloudflare などのクラウドの認証は Alchemy のプロファイルで管理する。
+- 環境変数は環境ごとに変わる値だけにする。変わらない値はコードか Alchemy の設定に、ツールにフラグがあればフラグにする。
 
-## Cloudflare
+## ライブラリ
 
-- Cloudflare は Workers Paid プランを契約している前提でよい。Paid プランでしか使えない機能や上限を前提に設計してよい。
+- ライブラリが型を提供する値は、その型のまま `Schema.decode*` に渡す。
+- ライブラリが export する型・スキーマ・enum・定数を書き写さない。
+- 外部 API のクライアントは手で包まず、Effect 公式のパッケージ、distilled.cloud（Cloudflare は `@distilled.cloud/cloudflare`）、公開 OpenAPI から `@effect/openapi-generator` で生成、の順に選ぶ。
 
-## ライブラリの型
+## PR とマージ
 
-- ライブラリが型を提供する値は、`Schema.decodeUnknown*` で受けて型を捨てない。ライブラリの型のまま受けて `Schema.decode*` に渡す。入力の型が Schema の Encoded と食い違えばコンパイルが落ちる。
-- ライブラリが export する型・スキーマ・enum・定数を自前で書き写さない。一部だけ使うときも `Pick` などでライブラリの型から作る。
-- 入力が `unknown` でなければ、`@effect/tsgo` の `prefer-typed-schema-decoder`（error）が `decode*` を求める。
-
-## 外部 API クライアント
-
-Effect から外部 API や SaaS を呼ぶクライアントは手で包まず、次の順で選ぶ。
-
-1. Effect 公式のパッケージ（https://github.com/Effect-TS/effect#packages）にあれば使う。
-2. distilled.cloud に Effect 定義があれば使う。Cloudflare は生成済みの `@distilled.cloud/cloudflare` を使う。
-3. どちらにもなければ、公開されている OpenAPI から `@effect/openapi-generator` の `openapigen` で生成する。
-
-## レビューとCI
-
-- PRのレビューは行わない。PRは作ったらすぐマージする。
-- PRのタイトルと本文は基本的に人間が読まないので、人間向けの説明を書かない。後でエージェント自身が検索したときに、自然に思いつく単語で引っかかり、何をしたか分かる程度でよい。
-- PR単位のCIは走らせない。`pull_request` トリガーのワークフローは、最新の main を取り込んでいない PR のマージをルールセットで拒むための `up-to-date`（何も検査しない）だけにする。
-- CIはmainへのpushで必ず走らせる。ワークフローは `.github/workflows/verify.yml` である。
-- デプロイやリリースのジョブは、同じワークフローで `needs: verify` を指定し、mainの必須CIが通ってから実行する。
-- マージ前に必ず base ブランチを取り込み、手元の `vp run verify` を通してからマージする。コンフリクトしないからといって、取り込まないままマージしない。マージしてよいかは聞かない。
-- PRごとの動作検証やデプロイはしない。動作の確認は、mainにマージしてデプロイされた本番で実測して行う。
-- Claude のクラウドセッションではプロキシが GitHub API を拒むため、`actions-lint` タスク（`vite.config.ts`）は `CLAUDE_CODE_REMOTE` が設定されていると zizmor に `--no-online-audits` を付け、オフライン監査だけを行う。フックにも渡る環境変数で切り替えるため、Stop フックの verify でも同じになる。オンライン監査は main の CI（`.github/workflows/verify.yml`）が担う。
+- PR のレビュー、PR ごとの CI・動作検証・デプロイはしない。動作は本番で確かめる。
+- マージ前に base を取り込み、手元の `vp run verify` を通してから自分でマージする。マージしてよいかは聞かない。ルールセットのバイパスや `--admin` は使わない。
 
 ## oxlint-plugin-decision
 
-- 文章で書く lint ルールは `decision-rules.ts` に `defineDecisionRule` で書き、`vite.config.ts` で有効にする。`vp check` が判定し、答えは `node_modules/.cache/oxlint-plugin-decision` にキャッシュされる。
-- 無料の `openrouter/respan/span-01-lite` で判定できないルールだけを有料の decider で判定する。判定できるかは、正解の分かる違反例と、このリポジトリの書き方どおりに書いた違反でない例を、キャッシュを消して `OXLINT_DECISION_EXPLAIN=json` で判定させて確かめる。無料で判定できるルールにまで課金しないためである。
-- OpenRouter の使用量は、リポジトリと実行元（`github-actions`・`claude-code-cloud`・`claude-code`・`local`）ごとのアプリに分かれる。実行元は `GITHUB_ACTIONS`・`CLAUDE_CODE_REMOTE`・`CLAUDECODE` で見分けるため、`verify` タスクはこれらを `untrackedEnv` で lint に渡す。
+- 有料の decider は、無料の `openrouter/respan/span-01-lite` で判定できないルールだけに使う。判定できるかは、正解の分かる違反例と違反でない例を、キャッシュを消して `OXLINT_DECISION_EXPLAIN=json` で確かめる。
+- ルールが使うモデルは、ユーザーの指示なしに変えない。
 
 ## 計測
 
-- 推測するな、計測しろ。仮説を立てたら、実装や修正の前に計測で事実を確かめ、その結果だけで判断する。
-- 機能開発に取り掛かる前に、AIが自分でデバッグできる仕組みを必ず作る。再現手段、ログやスパン、その出力を読む経路の3つである。
-- 時間かお金を使う処理（外部APIやモデルへのリクエスト、子プロセス、ファイルの入出力など）は、Workersに限らずすべてスパンにし、外から読めるようにする。Workers以外のプロセス（CLI、ライブラリ、ワーカースレッド）は、Effect公式の `OtlpTracer.layerFromConfig` を使い、標準の `OTEL_TRACES_EXPORTER=otlp` と `OTEL_EXPORTER_OTLP_ENDPOINT` が設定されたときだけOTLPに出す。Effect は `OTEL_TRACES_EXPORTER` が無いと送らない。
-- スパンは時間を使っている処理そのものに仕込む。計測のためだけにコマンドやプロセスを包まない。
-- このリポジトリは npm パッケージだけを出し、デプロイ先を持たない。そのため Cloudflare へのデプロイと、テンプレートの GitHub Actions の計測（`ci-telemetry` の Worker と送信ジョブ）は置かない。
-- 計測は本番環境で行えるようにする。できないときは、あらゆる手段で本番同等を保証したステージング環境を作って行う。手元やテスト環境だけの計測は判断の根拠にしない。
-- 実践の手順は `measure-dont-guess` スキルにある。不具合の調査は `systematic-debugging`、完了の確認は `verification-before-completion` スキルに従う。
+- 推測せず計測する。実装や修正の前に本番で事実を確かめ、その結果だけで判断する。
+- 機能開発の前に、AI が自分でデバッグできる仕組み（再現手段、ログやスパン、それを読む経路）を作る。
+- 時間かお金を使う処理はすべてスパンにする。Workers 以外は `OtlpTracer.layerFromConfig` で出す。計測のためだけにコマンドやプロセスを包まない。
+- Cloudflare へのデプロイと ci-telemetry は置かない。
 
-## 脆弱性スキャン
+## 脆弱性
 
-- 依存パッケージの既知の脆弱性は、verify の `audit` タスク（`vp pm audit`）が落とす。直すときは `vp pm audit --fix` で `pnpm-workspace.yaml` の overrides に修正版を足す。修正版が出ていない勧告だけを、`auditConfig.ignoreGhsas` に GHSA の ID で載せ、理由をコミットメッセージに書く。
+- `audit` は `vp pm audit --fix` で直す。修正版の無い勧告だけを `auditConfig.ignoreGhsas` に載せ、理由をコミットメッセージに書く。
 
 ## スキル
 
-- 複数のリポジトリで共通に使う自作のスキルは https://github.com/masseater/skills に置き、skills CLI で `skills-lock.json` に追加する。リポジトリにコピーしない。
-
-## ベース
-
-- このリポジトリのベースは https://github.com/masseater/typescript-template である。テンプレート由来の構成・方針はテンプレートに従う。
+- 複数リポで使う自作スキルは masseater/skills に置き、skills CLI で入れる。
