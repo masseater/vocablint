@@ -57,6 +57,7 @@ release. Add a tool name to select part of the graph. For example, run
 
 - 有料の decider は、無料の `openrouter/respan/span-01-lite` で判定できないルールだけに使う。判定できるかは、正解の分かる違反例と違反でない例を、キャッシュを消して `OXLINT_DECISION_EXPLAIN=json` で確かめる。
 - ルールが使うモデルは、ユーザーの指示なしに変えない。
+- 確信できるものだけを違反にする。取りこぼしは許容し、閾値を下げて拾いにいかない。
 
 ## 計測
 
