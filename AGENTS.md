@@ -97,6 +97,10 @@ Effect から外部 API や SaaS を呼ぶクライアントは手で包まず�
 
 - 複数のリポジトリで共通に使う自作のスキルは https://github.com/masseater/skills に置き、skills CLI で `skills-lock.json` に追加する。リポジトリにコピーしない。
 
+## 公開先
+
+- デプロイ先や外部公開しているもの（サイト、API、npm パッケージなど）があれば、その URL を README に一覧で載せる。
+
 ## ベース
 
 - このリポジトリのベースは https://github.com/masseater/typescript-template である。テンプレート由来の構成・方針はテンプレートに従う。
