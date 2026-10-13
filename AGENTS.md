@@ -69,6 +69,10 @@ release. Add a tool name to select part of the graph. For example, run
 
 - `audit` は `vp pm audit --fix` で直す。修正版の無い勧告だけを `auditConfig.ignoreGhsas` に載せ、理由をコミットメッセージに書く。
 
+## 公開先
+
+- デプロイ先や外部公開しているもの（サイト、API、npm パッケージなど）があれば、その URL を README に一覧で載せる。
+
 ## スキル
 
 - 複数リポで使う自作スキルは masseater/skills に置き、skills CLI で入れる。
