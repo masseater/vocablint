@@ -1,78 +1,66 @@
 # vocablint
 
-vocablint makes every finite value set and object shape derive from the place that already owns it.
-An owner is either a constant registered in the repository or a type exported by a dependency.
-Checks run on the TypeScript type checker alone; no AI is involved.
+vocablint keeps one owner for each set of values and object shape in a TypeScript repository.
+It finds code that restates one already defined elsewhere.
 
-## Usage
+A union such as `"asc" | "desc"` gets copied into a component, an API schema and a test. When someone adds `"none"` to one of them, the copies silently drift apart. vocablint reports each copy and names the owner to derive it from. An owner is a constant you register in your repository, or a type exported by a dependency. It runs on the TypeScript type checker alone, so it costs nothing to run and gives the same answer every time.
 
-Run the CLI at the repository root.
-It exits with code 1 when it finds a violation.
+vocablint is not on npm yet. Build it from this repository as shown below.
 
-```sh
-vp exec vocablint
-vp exec vocablint --json
-```
+## What it reports
 
-vocablint finds every tsconfig.json under the root and type-checks each one as a project.
-Files that start with `// @ts-nocheck` are skipped because they are not type-checked.
+- A set of values that restates a registered owner, or extends it with extra values
+- A literal written by hand where a type derived from an owner is expected
+- A set of values or an object shape that copies a type exported by a dependency
+- The same unowned set of values declared in more than one place
 
-## Registering an owner
+## Build it
 
-Add the `@vocablint` tag and a concept ID to a top-level `const` in a module.
-
-```ts
-/** @vocablint sort-order */
-const SORT_ORDERS = ["asc", "desc"] as const;
-type SortOrder = (typeof SORT_ORDERS)[number];
-```
-
-## Rules
-
-| Rule                  | Reports                                                                                 |
-| --------------------- | --------------------------------------------------------------------------------------- |
-| `owner-value-set`     | A set that restates a registered owner's values                                         |
-| `owner-extension`     | A set derived from an owner with extra values added                                     |
-| `owned-literal`       | A literal written directly where a type derived from an owner is expected               |
-| `library-value-set`   | A set that restates the values of a dependency's type                                   |
-| `library-shape`       | An interface, type or schema that copies a dependency's object type (3 or more members) |
-| `duplicate-value-set` | The same unowned value set declared in more than one place                              |
-| `owner-annotation`    | A misplaced or malformed `@vocablint` tag                                               |
-
-Effect Schema's `Schema.Literals` and `Schema.Struct` are treated the same as the equivalent types.
-
-## oxlint plugin
-
-The plugin reports the CLI's results to oxlint, file by file.
-The CLI does the checking; the plugin only reads its output.
-
-```ts
-export default defineConfig({
-  lint: {
-    jsPlugins: [{ name: "vocablint", specifier: "@r_masseater/vocablint/oxlint" }],
-    rules: { "vocablint/vocabulary": "error" },
-  },
-});
-```
-
-## Development
+You need Node.js 22 or later and [Vite+](https://viteplus.dev/guide/) (`vp`).
 
 ```sh
+git clone https://github.com/masseater/vocablint.git
+cd vocablint
 vp install
-cp .env.example .env
-vp run verify
+vp run --filter @r_masseater/vocablint build
 ```
 
-### Environment variables
+The CLI is now at `tools/vocablint/dist/cli.mjs`.
 
-Put them in `.env` at the root.
+## Use it
 
-| Name                 | Used for                                                 |
-| -------------------- | -------------------------------------------------------- |
-| `OPENROUTER_API_KEY` | oxlint-plugin-decision checks that run during `vp check` |
+Register an owner by adding the `@vocablint` tag and a concept ID to a top-level `const`.
 
-### GitHub settings
+```ts
+// src/sort.ts
+/** @vocablint sort-order */
+export const SORT_ORDERS = ["asc", "desc"] as const;
+```
 
-Configure the GitHub side with gh.
-This covers secrets, pull requests by Actions, who may open pull requests, and the branch ruleset.
-The steps are in the `setup-template` skill ([masseater/skills](https://github.com/masseater/skills)).
+Then run the CLI at the root of your repository. It type-checks every `tsconfig.json` under the current directory.
+
+```sh
+node path/to/vocablint/tools/vocablint/dist/cli.mjs
+```
+
+A file that writes the same values again is reported, and the command exits with code 1.
+
+```ts
+// src/list.ts
+export type Order = "asc" | "desc";
+```
+
+```text
+src/list.ts:2:21 [owner-value-set] The values "asc" | "desc" are owned by sort-order (SORT_ORDERS). Derive this set from the owner instead of restating it.
+```
+
+Derive the type from the owner and the command exits with code 0.
+
+```ts
+// src/list.ts
+import type { SORT_ORDERS } from "./sort.ts";
+
+export type Order = (typeof SORT_ORDERS)[number];
+```
+
+Add `--json` to get the problems as a JSON array instead.
