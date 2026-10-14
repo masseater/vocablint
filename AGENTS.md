@@ -41,6 +41,7 @@ release. Add a tool name to select part of the graph. For example, run
 ## コマンド
 
 - `vp run verify` は、ルートの `vp check` にテスト・ESLint・fallow・gitleaks・audit などの検査を束ねたタスクである。pre-push フックと Stop フックも同じ verify を走らせる。
+- `vp check` は oxlint-plugin-decision の判定に `.env` の `OPENROUTER_API_KEY` を使う。`.env.example` を写して作る。
 - テストを 1 つだけ走らせるときは、`libs/vocablint` か `tools/vocablint` で `vp test run <ファイル>` を実行する。
 - `tools/vocablint` の `vp run build` は、`vp pack` で CLI と oxlint プラグインを `dist/` に出す。
 
