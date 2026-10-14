@@ -38,6 +38,18 @@ release. Add a tool name to select part of the graph. For example, run
 
 <!--VITE PLUS END-->
 
+## コマンド
+
+- `vp run verify` は、ルートの `vp check` にテスト・ESLint・fallow・gitleaks・audit などの検査を束ねたタスクである。pre-push フックと Stop フックも同じ verify を走らせる。
+- テストを 1 つだけ走らせるときは、`libs/vocablint` か `tools/vocablint` で `vp test run <ファイル>` を実行する。
+- `tools/vocablint` の `vp run build` は、`vp pack` で CLI と oxlint プラグインを `dist/` に出す。
+
+## 構成
+
+- 検査の本体は `libs/vocablint`（`@vocablint/core`）にある。`tools/vocablint` は npm に出す `@r_masseater/vocablint` で、CLI と oxlint プラグインだけを持つ。
+- 解析には `typescript-6` の別名で入れた TypeScript 6 の API を使う。`typescript` は 7 系の tsgo で、このリポジトリ自身の型検査に使う。
+- `checkRepository` は、tsconfig.json ごとにプログラムを作る。全プロジェクトから `@vocablint` の持ち主を集めてから各プロジェクトを解析し、最後に持ち主の無い値の集合の重複を突き合わせる。
+
 ## 環境変数
 
 - 環境変数は環境ごとに変わる値だけにする。変わらない値はコードか Alchemy の設定に、ツールにフラグがあればフラグにする。
