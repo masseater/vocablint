@@ -75,4 +75,4 @@ Put them in `.env` at the root.
 
 Configure the GitHub side with gh.
 This covers secrets, pull requests by Actions, who may open pull requests, and the branch ruleset.
-The steps are in the `setup-github` skill ([masseater/skills](https://github.com/masseater/skills)).
+The steps are in the `setup-template` skill ([masseater/skills](https://github.com/masseater/skills)).
