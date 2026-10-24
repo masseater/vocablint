@@ -31,10 +31,10 @@
     },
     "cloudflare": {
       "source": "cloudflare/skills",
-      "ref": "c430dd965cea3a8faf0ef035e3b3d73b38518081",
+      "ref": "1f987d740b3fe3be1fe3c1839cfdb5fe1a44f1e1",
       "sourceType": "github",
       "skillPath": "skills/cloudflare/SKILL.md",
-      "computedHash": "ec9de05454b2c5101c92d9e4927065258c090fa5207a106d764f7cc07ed55dbb"
+      "computedHash": "51522c6fbd95a2eaa9631a7651ba3ef434fcc92d9573c64eb28ef723290b6099"
     },
     "commit-and-git": {
       "source": "philtzjp/skills",
@@ -199,10 +199,10 @@
     },
     "modern-web-guidance": {
       "source": "GoogleChrome/modern-web-guidance",
-      "ref": "a97286845f2baba38988f9e5fe2b2a1351021e50",
+      "ref": "b31dc0a43ff5d19bcf386a3476a216f3b39a6f55",
       "sourceType": "github",
       "skillPath": "skills/modern-web-guidance/SKILL.md",
-      "computedHash": "dbd30d9c331c8957e065270150ffe44b4ba11ad5259cc9144240f63c45b05f1c"
+      "computedHash": "813274e05233f139ad0bc5f67ce7c4c524b4c81c672f9ff7905957b3a09b46b4"
     },
     "refresh-skills": {
       "source": "philtzjp/skills",
@@ -220,7 +220,7 @@
     },
     "shadcn": {
       "source": "shadcn-ui/ui",
-      "ref": "993eb2c3151997ce08a49635c10fd8c8ef3713c7",
+      "ref": "30a58d4498f270af1c1e981a7d78a15cf5740841",
       "sourceType": "github",
       "skillPath": "skills/shadcn/SKILL.md",
       "computedHash": "da388f632cd83783c02967446e21941c9ee8291ccb43ba74c23f7d4e9b7c298c"
@@ -297,17 +297,17 @@
     },
     "workers-best-practices": {
       "source": "cloudflare/skills",
-      "ref": "c430dd965cea3a8faf0ef035e3b3d73b38518081",
+      "ref": "1f987d740b3fe3be1fe3c1839cfdb5fe1a44f1e1",
       "sourceType": "github",
       "skillPath": "skills/workers-best-practices/SKILL.md",
-      "computedHash": "e1c30e93854345114dfa6a0a077363119eb99c03e5c64a8f2109349802e1f2aa"
+      "computedHash": "e12970301753ed7eaa5ca375d4b98e0e36c9554e8f2809cb4b543c2ea7d9b4b8"
     },
     "yomiyasu": {
       "source": "nanaism/yomiyasu",
       "ref": "15244a1369c192d6b7e74963ee9709537fadf166",
       "sourceType": "github",
       "skillPath": "skills/yomiyasu/SKILL.md",
-      "computedHash": "2331db4c070bdc4edb78a783ccd5d93a85e0c818b330de081ab9b5014d2e3e45"
+      "computedHash": "f45a6586b47b539db151b18cab28687cc6541650b07e577976211a87919086c7"
     }
   }
 }
