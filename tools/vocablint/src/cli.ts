@@ -8,11 +8,18 @@ import {
   nodeRepositoryFiles,
 } from "@vocablint/core";
 import type { Problem } from "@vocablint/core";
-import { Cause, Data, Effect, Layer, Option, Schema, Stdio, Stream } from "effect";
+import { Cause, Effect, Layer, Option, Schema, Stdio, Stream, Array as Arr, pipe } from "effect";
 
 import { JSON_FLAG } from "./cli-contract.ts";
 
-class ProblemsFound extends Data.TaggedError("ProblemsFound")<{ readonly count: number }> {}
+const taggedError = Schema.TaggedError;
+
+class ProblemsFound extends taggedError<ProblemsFound, { readonly brand: unique symbol }>()(
+  "ProblemsFound",
+  {
+    count: Schema.Finite,
+  },
+) {}
 
 const NO_PROBLEMS = 0;
 
@@ -29,9 +36,15 @@ const reportText = (
   Effect.gen(function* report() {
     const files = yield* RepositoryFiles;
     const format = formatProblem((file) => files.relative(root, file));
-    yield* writeStdout(problems.map((problem) => `${format(problem)}\n`).join(""));
+    yield* writeStdout(
+      pipe(
+        problems,
+        Arr.map((problem) => `${format(problem)}\n`),
+        Arr.join(""),
+      ),
+    );
     if (problems.length > NO_PROBLEMS) {
-      return yield* new ProblemsFound({ count: problems.length });
+      return yield* ProblemsFound.make({ count: problems.length });
     }
     return yield* Effect.void;
   });
@@ -54,9 +67,7 @@ const reportFailure = <Failure>(
 ): Effect.Effect<void, never, Stdio.Stdio> =>
   Effect.gen(function* report() {
     const stdio = yield* Stdio.Stdio;
-    const failed = Cause.findErrorOption(cause).pipe(
-      Option.exists((failure) => failure instanceof ProblemsFound),
-    );
+    const failed = Cause.findErrorOption(cause).pipe(Option.exists(Schema.is(ProblemsFound)));
     if (failed) {
       return;
     }

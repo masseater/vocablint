@@ -1,4 +1,4 @@
-import { Array as Arr, Option, Order } from "effect";
+import { Array as Arr, Option, Order, pipe } from "effect";
 import ts from "typescript-6";
 
 import { describeLibraryType, isObjectType } from "./library.ts";
@@ -56,7 +56,12 @@ const schemaShapeOf =
       return Option.none();
     }
     const { arguments: callArguments } = node;
-    if (!callArguments.some((argument) => ts.isObjectLiteralExpression(argument))) {
+    if (
+      !pipe(
+        callArguments,
+        Arr.some((argument) => ts.isObjectLiteralExpression(argument)),
+      )
+    ) {
       return Option.none();
     }
     return schemaTypeOf(checker)(checker.getTypeAtLocation(node)).pipe(
@@ -68,10 +73,13 @@ const shapeSitesIn =
   (checker: ts.TypeChecker) =>
   (sourceFile: ts.SourceFile): readonly ShapeSite[] =>
     Arr.getSomes(
-      descendantsOf(sourceFile).map((node) =>
-        declaredShapeOf(checker)(node).pipe(
-          Option.orElse(() => schemaShapeOf(checker)(node)),
-          Option.map((type) => ({ node, type })),
+      pipe(
+        descendantsOf(sourceFile),
+        Arr.map((node) =>
+          declaredShapeOf(checker)(node).pipe(
+            Option.orElse(() => schemaShapeOf(checker)(node)),
+            Option.map((type) => ({ node, type })),
+          ),
         ),
       ),
     );
@@ -94,9 +102,12 @@ const matchOf =
   (site: ShapeSite, shape: LibraryShape): Option.Option<ShapeMatch> => {
     const { checker } = context;
     const locals = checker.getPropertiesOfType(site.type);
-    const matches = locals.every((local) =>
-      Option.fromUndefinedOr(checker.getPropertyOfType(shape.type, local.getName())).pipe(
-        Option.exists((library) => sameProperty(checker)(local, library)),
+    const matches = pipe(
+      locals,
+      Arr.every((local) =>
+        Option.fromUndefinedOr(checker.getPropertyOfType(shape.type, local.getName())).pipe(
+          Option.exists((library) => sameProperty(checker)(local, library)),
+        ),
       ),
     );
     if (!matches) {
@@ -111,16 +122,19 @@ const matchOf =
 const isDerivedFrom =
   (context: ShapeContext) =>
   (site: ShapeSite, shape: LibraryShape): boolean =>
-    referencedSymbols(context.checker)(site.node).some((symbol) =>
-      (symbol.getDeclarations() ?? []).includes(shape.declaration),
+    pipe(
+      referencedSymbols(context.checker)(site.node),
+      Arr.some((symbol) => (symbol.getDeclarations() ?? []).includes(shape.declaration)),
     );
 
 const matchOrder = Order.mapInput(Order.Number, (match: ShapeMatch) => match.extra);
 
 const shapeProblem = (site: ShapeSite, matches: readonly ShapeMatch[]): Problem => {
-  const shown = Arr.take(matches, CANDIDATE_LIMIT)
-    .map((match) => describeLibraryType(match.shape))
-    .join(", ");
+  const shown = pipe(
+    Arr.take(matches, CANDIDATE_LIMIT),
+    Arr.map((match) => describeLibraryType(match.shape)),
+    Arr.join(", "),
+  );
   const advice = Option.match(
     Arr.findFirst(matches, (match) => match.extra === EXACT),
     {
@@ -141,14 +155,13 @@ const shapeProblemOf =
     if (names.length < MINIMUM_SHAPE_PROPERTIES) {
       return Option.none();
     }
-    const matches = Arr.sort(
-      Arr.getSomes(
-        context.shapes
-          .filter((shape) => !isDerivedFrom(context)(site, shape))
-          .map((shape) => matchOf(context)(site, shape)),
-      ),
-      matchOrder,
+    const candidates = pipe(
+      context.shapes,
+      Arr.filter((shape) => !isDerivedFrom(context)(site, shape)),
+      Arr.map((shape) => matchOf(context)(site, shape)),
+      Arr.getSomes,
     );
+    const matches = Arr.sort(candidates, matchOrder);
     return Option.liftPredicate(matches, Arr.isReadonlyArrayNonEmpty).pipe(
       Option.map((found) => shapeProblem(site, found)),
     );
@@ -158,7 +171,10 @@ const shapeProblemsIn =
   (context: ShapeContext) =>
   (sourceFile: ts.SourceFile): readonly Problem[] =>
     Arr.getSomes(
-      shapeSitesIn(context.checker)(sourceFile).map((site) => shapeProblemOf(context)(site)),
+      pipe(
+        shapeSitesIn(context.checker)(sourceFile),
+        Arr.map((site) => shapeProblemOf(context)(site)),
+      ),
     );
 
 export { shapeProblemsIn };

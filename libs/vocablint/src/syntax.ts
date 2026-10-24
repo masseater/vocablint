@@ -1,4 +1,4 @@
-import { Array as Arr, Option } from "effect";
+import { Array as Arr, Option, String as Str, pipe } from "effect";
 import ts from "typescript-6";
 
 import { NODE_MODULES } from "./dependencies.ts";
@@ -19,13 +19,16 @@ const childrenOf = (node: ts.Node): readonly ts.Node[] => {
 };
 
 const descendantsOf = (node: ts.Node): readonly ts.Node[] =>
-  childrenOf(node).flatMap((child) => Arr.prepend(descendantsOf(child), child));
+  pipe(
+    childrenOf(node),
+    Arr.flatMap((child) => Arr.prepend(descendantsOf(child), child)),
+  );
 
 const isExternalFile =
   (program: ts.Program) =>
   (sourceFile: ts.SourceFile): boolean =>
     program.isSourceFileFromExternalLibrary(sourceFile) ||
-    sourceFile.fileName.includes(NODE_MODULES_SEGMENT);
+    Str.includes(NODE_MODULES_SEGMENT)(sourceFile.fileName);
 
 const isExternalDeclaration =
   (program: ts.Program) =>
@@ -47,7 +50,12 @@ const resolvedSymbol =
   (checker: ts.TypeChecker) =>
   (symbol: ts.Symbol): ts.Symbol => {
     const declarations = symbol.getDeclarations() ?? [];
-    if (!declarations.some((declaration) => isAliasDeclaration(declaration))) {
+    if (
+      !pipe(
+        declarations,
+        Arr.some((declaration) => isAliasDeclaration(declaration)),
+      )
+    ) {
       return symbol;
     }
     return checker.getAliasedSymbol(symbol);
@@ -63,10 +71,14 @@ const symbolAt =
 const referencedSymbols =
   (checker: ts.TypeChecker) =>
   (node: ts.Node): readonly ts.Symbol[] => {
-    const identifiers = Arr.prepend(descendantsOf(node), node).filter((candidate) =>
-      ts.isIdentifier(candidate),
+    const identifiers = pipe(
+      Arr.prepend(descendantsOf(node), node),
+      Arr.filter((candidate) => ts.isIdentifier(candidate)),
     );
-    const symbols = identifiers.map((identifier) => symbolAt(checker)(identifier));
+    const symbols = pipe(
+      identifiers,
+      Arr.map((identifier) => symbolAt(checker)(identifier)),
+    );
     return uniqueByReference(Arr.getSomes(symbols));
   };
 
@@ -106,7 +118,10 @@ const isGenericDeclaration = (declaration: ts.Declaration): boolean =>
 const propertyNamesOf =
   (checker: ts.TypeChecker) =>
   (type: ts.Type): readonly string[] =>
-    checker.getPropertiesOfType(type).map((property) => property.getName());
+    pipe(
+      checker.getPropertiesOfType(type),
+      Arr.map((property) => property.getName()),
+    );
 
 export {
   NODE_MODULES_SEGMENT,

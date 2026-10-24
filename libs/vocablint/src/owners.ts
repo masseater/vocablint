@@ -1,4 +1,4 @@
-import { Array as Arr, Option } from "effect";
+import { Array as Arr, Option, String as Str, pipe } from "effect";
 import ts from "typescript-6";
 
 import { problemAt } from "./problem.ts";
@@ -38,10 +38,11 @@ const ownerKeyOf = (declaration: ts.Declaration): Option.Option<string> => {
 };
 
 const annotationsOf = (node: ts.Node): readonly Annotated[] =>
-  ts
-    .getJSDocTags(node)
-    .filter((tag) => tag.tagName.text === OWNER_TAG)
-    .map((tag) => ({ node, conceptId: (ts.getTextOfJSDocComment(tag.comment) ?? "").trim() }));
+  pipe(
+    ts.getJSDocTags(node),
+    Arr.filter((tag) => tag.tagName.text === OWNER_TAG),
+    Arr.map((tag) => ({ node, conceptId: Str.trim(ts.getTextOfJSDocComment(tag.comment) ?? "") })),
+  );
 
 const ANNOTATABLE_KINDS: ReadonlySet<ts.SyntaxKind> = new Set([
   ts.SyntaxKind.VariableDeclaration,
@@ -75,7 +76,10 @@ const objectValuesOf =
   (checker: ts.TypeChecker) =>
   (type: ts.Type): Option.Option<readonly Value[]> =>
     literalValuesOf(
-      checker.getPropertiesOfType(type).map((property) => checker.getTypeOfSymbol(property)),
+      pipe(
+        checker.getPropertiesOfType(type),
+        Arr.map((property) => checker.getTypeOfSymbol(property)),
+      ),
     );
 
 const ownerValuesOf =
@@ -131,42 +135,77 @@ const ownerOf =
   };
 
 const annotatedIn = (sourceFile: ts.SourceFile): readonly Annotated[] =>
-  descendantsOf(sourceFile)
-    .filter((node) => isAnnotatable(node))
-    .flatMap((node) => annotationsOf(node));
+  pipe(
+    descendantsOf(sourceFile),
+    Arr.filter((node) => isAnnotatable(node)),
+    Arr.flatMap((node) => annotationsOf(node)),
+  );
 
 const conflictProblems = (owners: readonly Owner[]): readonly Problem[] =>
-  owners.flatMap((owner, index) => {
-    const earlier = Arr.take(owners, index);
-    const sameConcept = earlier.filter((other) => other.conceptId === owner.conceptId);
-    const sameSet = earlier.filter(
-      (other) => other.conceptId !== owner.conceptId && sameValues(other.values, owner.values),
-    );
-    return [
-      ...Arr.take(sameConcept, FIRST_OWNER_COUNT).map(() =>
-        annotationProblem(`The concept ${owner.conceptId} already has an owner.`)(
-          owner.declaration,
+  pipe(
+    owners,
+    Arr.flatMap((owner, index) => {
+      const earlier = Arr.take(owners, index);
+      const sameConcept = pipe(
+        earlier,
+        Arr.filter((other) => other.conceptId === owner.conceptId),
+      );
+      const sameSet = pipe(
+        earlier,
+        Arr.filter(
+          (other) => other.conceptId !== owner.conceptId && sameValues(other.values, owner.values),
         ),
-      ),
-      ...Arr.take(sameSet, FIRST_OWNER_COUNT).map((other) =>
-        annotationProblem(
-          `The values ${formatValues(owner.values)} are already owned by ${other.conceptId}.`,
-        )(owner.declaration),
-      ),
-    ];
-  });
+      );
+      return [
+        ...pipe(
+          Arr.take(sameConcept, FIRST_OWNER_COUNT),
+          Arr.map(() =>
+            annotationProblem(`The concept ${owner.conceptId} already has an owner.`)(
+              owner.declaration,
+            ),
+          ),
+        ),
+        ...pipe(
+          Arr.take(sameSet, FIRST_OWNER_COUNT),
+          Arr.map((other) =>
+            annotationProblem(
+              `The values ${formatValues(owner.values)} are already owned by ${other.conceptId}.`,
+            )(owner.declaration),
+          ),
+        ),
+      ];
+    }),
+  );
 
 const scanOwners = (projects: readonly Project[]): OwnerScan => {
-  const results = projects.flatMap((project) =>
-    project.sourceFiles.flatMap((sourceFile) =>
-      annotatedIn(sourceFile).map((annotated) => ownerOf(project)(annotated)),
+  const results = pipe(
+    projects,
+    Arr.flatMap((project) =>
+      pipe(
+        project.sourceFiles,
+        Arr.flatMap((sourceFile) =>
+          pipe(
+            annotatedIn(sourceFile),
+            Arr.map((annotated) => ownerOf(project)(annotated)),
+          ),
+        ),
+      ),
     ),
   );
   const owners = Arr.dedupeWith(
-    results.flatMap((result) => result.owners),
+    pipe(
+      results,
+      Arr.flatMap((result) => result.owners),
+    ),
     (left, right) => left.key === right.key,
   );
-  const problems = [...results.flatMap((result) => result.problems), ...conflictProblems(owners)];
+  const problems = [
+    ...pipe(
+      results,
+      Arr.flatMap((result) => result.problems),
+    ),
+    ...conflictProblems(owners),
+  ];
   return { owners, problems };
 };
 

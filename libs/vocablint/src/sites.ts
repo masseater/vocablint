@@ -1,4 +1,4 @@
-import { Array as Arr, Option } from "effect";
+import { Array as Arr, Option, pipe } from "effect";
 import ts from "typescript-6";
 
 import {
@@ -20,7 +20,12 @@ interface ValueSite {
 const namedValuesOf =
   (checker: ts.TypeChecker) =>
   (symbol: ts.Symbol): Option.Option<readonly Value[]> => {
-    if (declarationsOf(symbol).some((declaration) => isTypeDeclaration(declaration))) {
+    if (
+      pipe(
+        declarationsOf(symbol),
+        Arr.some((declaration) => isTypeDeclaration(declaration)),
+      )
+    ) {
       return finiteValuesOf(checker)(checker.getDeclaredTypeOfSymbol(symbol));
     }
     return finiteValuesOf(checker)(checker.getTypeOfSymbol(symbol));
@@ -54,11 +59,14 @@ const selectsKeys =
     if (!ts.isTypeReferenceNode(parent)) {
       return false;
     }
-    return (parent.typeArguments ?? [])
-      .filter((argument) => argument !== node)
-      .some((argument) =>
+    const typeArguments: readonly ts.TypeNode[] = parent.typeArguments ?? [];
+    return pipe(
+      typeArguments,
+      Arr.filter((argument) => argument !== node),
+      Arr.some((argument) =>
         isSubsetOf(values, propertyNamesOf(checker)(checker.getTypeFromTypeNode(argument))),
-      );
+      ),
+    );
   };
 
 const unionValuesOf =
@@ -98,14 +106,18 @@ const derivationScopeOf = (node: ts.Node): ts.Node => {
 const sourcesOf =
   (checker: ts.TypeChecker) =>
   (node: ts.Node): readonly ts.Symbol[] =>
-    referencedSymbols(checker)(derivationScopeOf(node)).filter((symbol) =>
-      Option.isSome(namedValuesOf(checker)(symbol)),
+    pipe(
+      referencedSymbols(checker)(derivationScopeOf(node)),
+      Arr.filter((symbol) => Option.isSome(namedValuesOf(checker)(symbol))),
     );
 
 const sitesUnder =
   (checker: ts.TypeChecker) =>
   (node: ts.Node): readonly ValueSite[] => {
-    const nested = childrenOf(node).flatMap((child) => sitesUnder(checker)(child));
+    const nested = pipe(
+      childrenOf(node),
+      Arr.flatMap((child) => sitesUnder(checker)(child)),
+    );
     if (Arr.isReadonlyArrayNonEmpty(nested)) {
       return nested;
     }

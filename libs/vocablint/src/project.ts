@@ -1,4 +1,13 @@
-import { Array as Arr, Effect, Function as Fn, Option, Order, Predicate } from "effect";
+import {
+  Array as Arr,
+  Effect,
+  Function as Fn,
+  Option,
+  Order,
+  Predicate,
+  String as Str,
+  pipe,
+} from "effect";
 import ts from "typescript-6";
 
 import {
@@ -36,9 +45,11 @@ const listConfigFiles = (
   Effect.gen(function* configFilesUnder() {
     const files = yield* RepositoryFiles;
     const names = yield* files.readDirectory(directory);
-    const visible = names
-      .filter((name) => !name.startsWith(HIDDEN_PREFIX) && !SKIPPED_DIRECTORIES.has(name))
-      .map((name) => files.join(directory, name));
+    const visible = pipe(
+      names,
+      Arr.filter((name) => !Str.startsWith(HIDDEN_PREFIX)(name) && !SKIPPED_DIRECTORIES.has(name)),
+      Arr.map((name) => files.join(directory, name)),
+    );
     const nested = yield* Fn.pipe(
       visible,
       Effect.forEach((entryPath) =>
@@ -110,8 +121,9 @@ const NO_CHECK_PRAGMA = /^\/\/\s*@ts-nocheck/u;
 const FILE_START = 0;
 
 const skipsTypeChecking = (sourceFile: ts.SourceFile): boolean =>
-  (ts.getLeadingCommentRanges(sourceFile.text, FILE_START) ?? []).some((range) =>
-    NO_CHECK_PRAGMA.test(sourceFile.text.slice(range.pos, range.end)),
+  pipe(
+    ts.getLeadingCommentRanges(sourceFile.text, FILE_START) ?? [],
+    Arr.some((range) => NO_CHECK_PRAGMA.test(Str.slice(range.pos, range.end)(sourceFile.text))),
   );
 
 const DECLARATION_EXTENSION = ".d.ts";
@@ -139,7 +151,7 @@ const sharingDeclarations = (parsed: ts.ParsedCommandLine): ts.CompilerHost => {
   return {
     ...host,
     getSourceFile: (fileName, languageVersion, onError) => {
-      if (fileName.endsWith(DECLARATION_EXTENSION)) {
+      if (Str.endsWith(DECLARATION_EXTENSION)(fileName)) {
         return readDeclaration(fileName, languageVersion, onError);
       }
       return readSourceFile(fileName, languageVersion, onError);
@@ -153,7 +165,13 @@ const buildProject = Effect.fn("buildProject")(function* buildProject(
 ) {
   const entries = yield* dependencyEntries(info.directory);
   const program = ts.createProgram({
-    rootNames: [...parsed.fileNames, ...entries.map((entry) => entry.declarationsPath)],
+    rootNames: [
+      ...parsed.fileNames,
+      ...pipe(
+        entries,
+        Arr.map((entry) => entry.declarationsPath),
+      ),
+    ],
     options: { ...parsed.options, noEmit: true },
     host: sharingDeclarations(parsed),
   });
@@ -163,14 +181,15 @@ const buildProject = Effect.fn("buildProject")(function* buildProject(
     packageName: info.name,
     workspaceDependencies: info.workspaceDependencies,
     program,
-    sourceFiles: program
-      .getSourceFiles()
-      .filter(
+    sourceFiles: pipe(
+      program.getSourceFiles(),
+      Arr.filter(
         (sourceFile) =>
           projectFiles.has(sourceFile.fileName) &&
           !sourceFile.isDeclarationFile &&
           !skipsTypeChecking(sourceFile),
       ),
+    ),
     library: libraryIndex(program)(entries),
   } satisfies Project;
 });

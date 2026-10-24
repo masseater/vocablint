@@ -1,4 +1,4 @@
-import { Array as Arr, Effect, Schema, pipe } from "effect";
+import { Array as Arr, Effect, Schema, String as Str, pipe } from "effect";
 
 import {
   blockWhen,
@@ -26,8 +26,8 @@ const PostToolUseOutput = Schema.Struct({
 const locate = Effect.fn("locate")(function* locate(filePath: string) {
   const platform = yield* HookPlatform;
   const root = yield* projectRoot;
-  const [scope = "", name = ""] = platform.relative(root, filePath).split(platform.sep);
-  const candidates = [scope, platform.join(scope, name)].filter((dir) => dir !== "");
+  const [scope, name = ""] = Str.split(platform.sep)(platform.relative(root, filePath));
+  const candidates = Arr.filter([scope, platform.join(scope, name)], (dir) => dir !== "");
   return { candidates, root };
 });
 
@@ -40,7 +40,13 @@ const fallowTargets = Effect.fn("fallowTargets")(function* fallowTargets(
     candidates,
     Effect.filter((dir: string) => platform.exists(platform.join(root, dir, ".fallowrc.jsonc"))),
   );
-  return [[], ...withConfig.map((dir) => ["-r", dir])];
+  return [
+    [],
+    ...pipe(
+      withConfig,
+      Arr.map((dir) => ["-r", dir]),
+    ),
+  ];
 });
 
 const runFallow = Effect.fn("runFallow")(function* runFallow(
@@ -55,17 +61,24 @@ const runFallow = Effect.fn("runFallow")(function* runFallow(
       runCommand(fallow, ["--changed-since", "HEAD", "--quiet", "--format", "compact", ...args]),
     { concurrency: "unbounded" },
   );
-  yield* blockWhen(runs.filter((run) => !run.succeeded).map((run) => run.output));
+  yield* blockWhen(
+    pipe(
+      runs,
+      Arr.filter((run) => !run.succeeded),
+      Arr.map((run) => run.output),
+    ),
+  );
   return runs;
 });
 
 const reportDuplication = (
   runs: readonly CommandResult[],
 ): Effect.Effect<void, never, HookPlatform> => {
-  const duplication = Arr.dedupe(
-    runs
-      .flatMap((run) => run.stdout.split("\n"))
-      .filter((line) => line.startsWith("code-duplication:")),
+  const duplication = pipe(
+    runs,
+    Arr.flatMap((run) => Str.split("\n")(run.stdout)),
+    Arr.filter(Str.startsWith("code-duplication:")),
+    Arr.dedupe,
   );
   if (!Arr.isArrayNonEmpty(duplication)) {
     return Effect.void;
@@ -73,10 +86,10 @@ const reportDuplication = (
   return writeJson(PostToolUseOutput, {
     hookSpecificOutput: {
       hookEventName: "PostToolUse",
-      additionalContext: [
-        "fallow が重複を検出した。共通化すべきか判断すること。",
-        ...duplication,
-      ].join("\n"),
+      additionalContext: Arr.join(
+        ["fallow が重複を検出した。共通化すべきか判断すること。", ...duplication],
+        "\n",
+      ),
     },
   });
 };

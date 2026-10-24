@@ -1,28 +1,34 @@
 import { layer } from "@effect/vitest";
-import { Effect } from "effect";
+import { Effect, Array as Arr, pipe } from "effect";
 import { expect } from "vite-plus/test";
 
 import { findingsIn, fixtureLayer } from "./repository.test.support.ts";
 
-const STATUS_OWNER = [
-  "/** @vocablint order.status */",
-  'export const ORDER_STATUSES = ["draft", "published", "archived"] as const;',
-  "export type OrderStatus = (typeof ORDER_STATUSES)[number];",
-  "",
-].join("\n");
+const STATUS_OWNER = pipe(
+  [
+    "/** @vocablint order.status */",
+    'export const ORDER_STATUSES = ["draft", "published", "archived"] as const;',
+    "export type OrderStatus = (typeof ORDER_STATUSES)[number];",
+    "",
+  ],
+  Arr.join("\n"),
+);
 
 const reportsSetsThatRestateExtendOrSpellOutAn = Effect.gen(
   function* reportsSetsThatRestateExtendOrSpellOutAn() {
     const findings = yield* findingsIn({
       "src/status.ts": STATUS_OWNER,
-      "src/use.ts": [
-        'import type { OrderStatus } from "./status.ts";',
-        'export type Local = "draft" | "published";',
-        'export type Wider = OrderStatus | "deleted";',
-        "export const set = (status: OrderStatus): OrderStatus => status;",
-        'set("draft");',
-        "",
-      ].join("\n"),
+      "src/use.ts": pipe(
+        [
+          'import type { OrderStatus } from "./status.ts";',
+          'export type Local = "draft" | "published";',
+          'export type Wider = OrderStatus | "deleted";',
+          "export const set = (status: OrderStatus): OrderStatus => status;",
+          'set("draft");',
+          "",
+        ],
+        Arr.join("\n"),
+      ),
     });
     expect(findings).toStrictEqual([
       "src/use.ts:2 owner-value-set",
@@ -35,13 +41,16 @@ const reportsSetsThatRestateExtendOrSpellOutAn = Effect.gen(
 const acceptsSetsDerivedFromTheOwner = Effect.gen(function* acceptsSetsDerivedFromTheOwner() {
   const findings = yield* findingsIn({
     "src/status.ts": STATUS_OWNER,
-    "src/use.ts": [
-      'import { ORDER_STATUSES, type OrderStatus } from "./status.ts";',
-      'export type Published = Exclude<OrderStatus, "draft">;',
-      'export type Early = Extract<OrderStatus, "draft" | "published">;',
-      "export const copy = [...ORDER_STATUSES] as const;",
-      "",
-    ].join("\n"),
+    "src/use.ts": pipe(
+      [
+        'import { ORDER_STATUSES, type OrderStatus } from "./status.ts";',
+        'export type Published = Exclude<OrderStatus, "draft">;',
+        'export type Early = Extract<OrderStatus, "draft" | "published">;',
+        "export const copy = [...ORDER_STATUSES] as const;",
+        "",
+      ],
+      Arr.join("\n"),
+    ),
   });
   expect(findings).toStrictEqual([]);
 });
@@ -49,21 +58,24 @@ const acceptsSetsDerivedFromTheOwner = Effect.gen(function* acceptsSetsDerivedFr
 const reportsAnnotationsThatCannotRegisterAnOw = Effect.gen(
   function* reportsAnnotationsThatCannotRegisterAnOw() {
     const findings = yield* findingsIn({
-      "src/owners.ts": [
-        "/** @vocablint */",
-        'export const NAMELESS = ["a", "b"] as const;',
-        "/** @vocablint letters */",
-        "export const COUNT = 1;",
-        "/** @vocablint letters */",
-        'export type Letter = "a" | "b";',
-        "/** @vocablint colors */",
-        'export const COLORS = ["red", "blue"] as const;',
-        "/** @vocablint colors */",
-        'export const HUES = ["green", "cyan"] as const;',
-        "/** @vocablint tones */",
-        'export const TONES = ["red", "blue"] as const;',
-        "",
-      ].join("\n"),
+      "src/owners.ts": pipe(
+        [
+          "/** @vocablint */",
+          'export const NAMELESS = ["a", "b"] as const;',
+          "/** @vocablint letters */",
+          "export const COUNT = 1;",
+          "/** @vocablint letters */",
+          'export type Letter = "a" | "b";',
+          "/** @vocablint colors */",
+          'export const COLORS = ["red", "blue"] as const;',
+          "/** @vocablint colors */",
+          'export const HUES = ["green", "cyan"] as const;',
+          "/** @vocablint tones */",
+          'export const TONES = ["red", "blue"] as const;',
+          "",
+        ],
+        Arr.join("\n"),
+      ),
     });
     expect(findings).toStrictEqual([
       "src/owners.ts:2 owner-annotation",

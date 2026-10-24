@@ -1,4 +1,4 @@
-import { Effect, Schema } from "effect";
+import { Effect, Schema, String as Str } from "effect";
 
 import { localBin, runCommand, runHook, writeJson } from "./env.ts";
 
@@ -15,7 +15,7 @@ runHook(
     if (!verify.succeeded) {
       yield* writeJson(StopOutput, {
         decision: "block",
-        reason: `vp run verify が失敗している。\n${verify.output.slice(-REPORTED_OUTPUT_LENGTH)}`,
+        reason: `vp run verify が失敗している。\n${Str.slice(-REPORTED_OUTPUT_LENGTH)(verify.output)}`,
       });
     }
   }),
