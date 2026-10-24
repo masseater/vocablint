@@ -1,4 +1,14 @@
-import { Array as Arr, Effect, Option, Order, Predicate, Schema } from "effect";
+import {
+  Array as Arr,
+  Effect,
+  Option,
+  Order,
+  Predicate,
+  Schema,
+  String as Str,
+  Record as Rec,
+  pipe,
+} from "effect";
 
 import { RepositoryFiles } from "./repository-files.ts";
 
@@ -50,7 +60,7 @@ const conditionsOf = (held: unknown): readonly (readonly [string, unknown])[] =>
   if (!Predicate.isObject(held)) {
     return [];
   }
-  return Object.entries(held);
+  return Rec.toEntries(held);
 };
 
 const typesConditionIn = (held: unknown, depth: number): Option.Option<string> => {
@@ -94,16 +104,23 @@ const subpathTargetsOf = (exportsField: unknown): readonly SubpathTarget[] => {
     return [{ subpath: ROOT_SUBPATH, target: exportsField }];
   }
   const entries = conditionsOf(exportsField);
-  if (!entries.some(([subpath]) => subpath.startsWith(ROOT_SUBPATH))) {
+  if (
+    !pipe(
+      entries,
+      Arr.some(([subpath]) => Str.startsWith(ROOT_SUBPATH)(subpath)),
+    )
+  ) {
     return Arr.match(entries, {
       onEmpty: () => [],
       onNonEmpty: () => [{ subpath: ROOT_SUBPATH, target: exportsField }],
     });
   }
-  return entries
-    .filter(([subpath]) => subpath === ROOT_SUBPATH || subpath.startsWith(SUBPATH_PREFIX))
-    .filter(([subpath]) => !subpath.includes(WILDCARD))
-    .map(([subpath, target]) => ({ subpath, target }));
+  return pipe(
+    entries,
+    Arr.filter(([subpath]) => subpath === ROOT_SUBPATH || Str.startsWith(SUBPATH_PREFIX)(subpath)),
+    Arr.filter(([subpath]) => !Str.includes(WILDCARD)(subpath)),
+    Arr.map(([subpath, target]) => ({ subpath, target })),
+  );
 };
 
 const declarationsCandidateFor = (entryPath: string): Option.Option<string> => {
@@ -113,7 +130,7 @@ const declarationsCandidateFor = (entryPath: string): Option.Option<string> => {
   if (!SCRIPT_SUFFIX.test(entryPath)) {
     return Option.none();
   }
-  return Option.some(entryPath.replace(SCRIPT_SUFFIX, ".d.$<module>ts"));
+  return Option.some(Str.replace(SCRIPT_SUFFIX, ".d.$<module>ts")(entryPath));
 };
 
 const firstDeclarationsAmong = Effect.fn("firstDeclarationsAmong")(function* firstDeclarations(
@@ -122,24 +139,30 @@ const firstDeclarationsAmong = Effect.fn("firstDeclarationsAmong")(function* fir
 ) {
   const files = yield* RepositoryFiles;
   const candidates = Arr.getSomes(
-    entryPaths.map((entryPath) => declarationsCandidateFor(entryPath)),
+    pipe(
+      entryPaths,
+      Arr.map((entryPath) => declarationsCandidateFor(entryPath)),
+    ),
   );
   const existing = yield* Effect.filter(
-    candidates.map((candidate) => files.join(directory, candidate)),
+    pipe(
+      candidates,
+      Arr.map((candidate) => files.join(directory, candidate)),
+    ),
     (candidate) => files.exists(candidate),
   );
   return Arr.head(existing);
 });
 
 const importNameOf = (packageName: string): string => {
-  if (!packageName.startsWith(TYPES_SCOPE)) {
+  if (!Str.startsWith(TYPES_SCOPE)(packageName)) {
     return packageName;
   }
-  const unscoped = packageName.slice(TYPES_SCOPE.length);
-  if (!unscoped.includes(TYPES_SCOPE_SEPARATOR)) {
+  const unscoped = Str.slice(TYPES_SCOPE.length)(packageName);
+  if (!Str.includes(TYPES_SCOPE_SEPARATOR)(unscoped)) {
     return unscoped;
   }
-  return `@${unscoped.replace(TYPES_SCOPE_SEPARATOR, "/")}`;
+  return `@${Str.replace(TYPES_SCOPE_SEPARATOR, "/")(unscoped)}`;
 };
 
 const specifierFor = (packageName: string, subpath: string): string => {
@@ -147,7 +170,7 @@ const specifierFor = (packageName: string, subpath: string): string => {
   if (subpath === ROOT_SUBPATH) {
     return importName;
   }
-  return `${importName}/${subpath.slice(SUBPATH_PREFIX.length)}`;
+  return `${importName}/${Str.slice(SUBPATH_PREFIX.length)(subpath)}`;
 };
 
 const rootEntryPaths = (manifest: Manifest): readonly string[] =>
@@ -186,7 +209,12 @@ const entriesOfDependency = Effect.fn("entriesOfDependency")(function* entriesOf
   }
   const subpathEntries = yield* subpathEntriesOf(packageName, directory, manifest.value);
   const rootSpecifier = specifierFor(packageName, ROOT_SUBPATH);
-  if (subpathEntries.some((entry) => entry.specifier === rootSpecifier)) {
+  if (
+    pipe(
+      subpathEntries,
+      Arr.some((entry) => entry.specifier === rootSpecifier),
+    )
+  ) {
     return subpathEntries;
   }
   const rootDeclarations = yield* firstDeclarationsAmong(directory, rootEntryPaths(manifest.value));
@@ -198,18 +226,22 @@ const entriesOfDependency = Effect.fn("entriesOfDependency")(function* entriesOf
 });
 
 const declaredDependencies = (manifest: Manifest): readonly string[] =>
-  Object.entries({
-    ...manifest.dependencies,
-    ...manifest.devDependencies,
-    ...manifest.peerDependencies,
-  })
-    .filter(([, range]) => !range.startsWith(WORKSPACE_PROTOCOL))
-    .map(([packageName]) => packageName);
+  pipe(
+    Rec.toEntries({
+      ...manifest.dependencies,
+      ...manifest.devDependencies,
+      ...manifest.peerDependencies,
+    }),
+    Arr.filter(([, range]) => !Str.startsWith(WORKSPACE_PROTOCOL)(range)),
+    Arr.map(([packageName]) => packageName),
+  );
 
 const workspaceDependencies = (manifest: Manifest): readonly string[] =>
-  Object.entries({ ...manifest.dependencies, ...manifest.devDependencies })
-    .filter(([, range]) => range.startsWith(WORKSPACE_PROTOCOL))
-    .map(([packageName]) => packageName);
+  pipe(
+    Rec.toEntries({ ...manifest.dependencies, ...manifest.devDependencies }),
+    Arr.filter(([, range]) => Str.startsWith(WORKSPACE_PROTOCOL)(range)),
+    Arr.map(([packageName]) => packageName),
+  );
 
 const entryOrder = Order.mapInput(Order.String, (entry: DependencyEntry) => entry.specifier);
 

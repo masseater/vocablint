@@ -1,5 +1,14 @@
 import { layer as nodeServicesLayer } from "@effect/platform-node/NodeServices";
-import { Context, Effect, FileSystem, Layer, Path } from "effect";
+import {
+  Context,
+  Effect,
+  FileSystem,
+  Layer,
+  Path,
+  Array as Arr,
+  Record as Rec,
+  pipe,
+} from "effect";
 import type { Scope } from "effect";
 
 import { checkRepository } from "./check.ts";
@@ -58,7 +67,7 @@ const directoryWith = Effect.fn("directoryWith")(function* directoryWith(
   const repositoryFiles = yield* RepositoryFiles;
   const root = yield* fixtures.makeTempDirectory;
   yield* Effect.forEach(
-    Object.entries(files),
+    Rec.toEntries(files),
     ([fileName, source]) => fixtures.writeFile(repositoryFiles.join(root, fileName), source),
     { discard: true },
   );
@@ -84,9 +93,12 @@ const findingsIn = Effect.fn("findingsIn")(function* findingsIn(
   const repositoryFiles = yield* RepositoryFiles;
   const root = yield* fixtureRepository(files);
   const problems = yield* checkRepository(root);
-  return problems.map(
-    (problem) =>
-      `${repositoryFiles.relative(root, problem.file)}:${String(problem.line)} ${problem.rule}`,
+  return pipe(
+    problems,
+    Arr.map(
+      (problem) =>
+        `${repositoryFiles.relative(root, problem.file)}:${String(problem.line)} ${problem.rule}`,
+    ),
   );
 });
 

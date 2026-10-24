@@ -1,4 +1,4 @@
-import { Array as Arr, Option } from "effect";
+import { Array as Arr, Option, String as Str, pipe } from "effect";
 import ts from "typescript-6";
 
 import type { ValueSite } from "./sites.ts";
@@ -30,14 +30,19 @@ const UNSCOPED_SEGMENTS = 1;
 const MODULE_PREFIX = /^".*?"\./u;
 
 const packageOf = (fileName: string): string => {
-  const afterModules = fileName.slice(
-    fileName.lastIndexOf(NODE_MODULES_SEGMENT) + NODE_MODULES_SEGMENT.length,
+  const afterModules = pipe(
+    fileName,
+    Str.lastIndexOf(NODE_MODULES_SEGMENT),
+    Option.match({
+      onNone: () => fileName,
+      onSome: (index) => Str.slice(index + NODE_MODULES_SEGMENT.length)(fileName),
+    }),
   );
-  const segments = afterModules.split("/");
-  if (afterModules.startsWith(SCOPE_PREFIX)) {
-    return Arr.take(segments, SCOPED_SEGMENTS).join("/");
+  const segments = Str.split("/")(afterModules);
+  if (Str.startsWith(SCOPE_PREFIX)(afterModules)) {
+    return pipe(Arr.take(segments, SCOPED_SEGMENTS), Arr.join("/"));
   }
-  return Arr.take(segments, UNSCOPED_SEGMENTS).join("/");
+  return pipe(Arr.take(segments, UNSCOPED_SEGMENTS), Arr.join("/"));
 };
 
 const externalDeclarationOf =
@@ -55,7 +60,7 @@ const aliasTarget =
         externalDeclarationOf(context)(alias).pipe(
           Option.map(
             (declaration) =>
-              `${context.checker.getFullyQualifiedName(alias).replace(MODULE_PREFIX, "")} from ${packageOf(declaration.getSourceFile().fileName)}`,
+              `${Str.replace(MODULE_PREFIX, "")(context.checker.getFullyQualifiedName(alias))} from ${packageOf(declaration.getSourceFile().fileName)}`,
           ),
         ),
       ),
@@ -153,9 +158,11 @@ const flowsIn =
   (context: FlowContext) =>
   (sourceFile: ts.SourceFile): readonly Flow[] =>
     Arr.getSomes(
-      descendantsOf(sourceFile)
-        .filter((node) => isFlowSource(node))
-        .map((node) => flowOf(context)(node)),
+      pipe(
+        descendantsOf(sourceFile),
+        Arr.filter((node) => isFlowSource(node)),
+        Arr.map((node) => flowOf(context)(node)),
+      ),
     );
 
 export { flowsIn };

@@ -26,6 +26,7 @@
     "@textlint-ja/textlint-rule-preset-ai-writing": "1.7.0",
     "@types/node": "catalog:",
     "@typescript-eslint/parser": "catalog:",
+    "effect": "catalog:stack",
     "eslint": "catalog:",
     "eslint-plugin-baseline-js": "catalog:",
     "eslint-plugin-drizzle": "catalog:",

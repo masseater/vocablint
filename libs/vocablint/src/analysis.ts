@@ -1,4 +1,4 @@
-import { Option } from "effect";
+import { Option, Array as Arr, pipe } from "effect";
 import ts from "typescript-6";
 
 import { flowsIn } from "./flows.ts";
@@ -20,8 +20,9 @@ interface ProjectAnalysis {
 const isVisibleTo =
   (project: Project) =>
   (owner: Owner): boolean =>
-    project.sourceFiles.some(
-      (sourceFile) => sourceFile.fileName === owner.declaration.getSourceFile().fileName,
+    pipe(
+      project.sourceFiles,
+      Arr.some((sourceFile) => sourceFile.fileName === owner.declaration.getSourceFile().fileName),
     ) ||
     Option.exists(
       owner.packageName,
@@ -33,47 +34,90 @@ const ownerDeclarationsIn = (
   project: Project,
   owners: readonly Owner[],
 ): readonly ts.VariableDeclaration[] => {
-  const keys = new Set(owners.map((owner) => owner.key));
-  return project.sourceFiles.flatMap((sourceFile) =>
-    descendantsOf(sourceFile)
-      .filter((node) => ts.isVariableDeclaration(node))
-      .filter((declaration) => Option.exists(ownerKeyOf(declaration), (key) => keys.has(key))),
+  const keys = new Set(
+    pipe(
+      owners,
+      Arr.map((owner) => owner.key),
+    ),
+  );
+  return pipe(
+    project.sourceFiles,
+    Arr.flatMap((sourceFile) =>
+      pipe(
+        descendantsOf(sourceFile),
+        Arr.filter((node) => ts.isVariableDeclaration(node)),
+        Arr.filter((declaration) => Option.exists(ownerKeyOf(declaration), (key) => keys.has(key))),
+      ),
+    ),
   );
 };
 
 const isInside =
   (outers: readonly ts.Node[]) =>
   (node: ts.Node): boolean =>
-    outers.some((outer) => contains(outer)(node));
+    pipe(
+      outers,
+      Arr.some((outer) => contains(outer)(node)),
+    );
+
+const sitesOutside =
+  (checker: ts.TypeChecker) =>
+  (project: Project, outers: readonly ts.Node[]): readonly ValueSite[] =>
+    pipe(
+      project.sourceFiles,
+      Arr.flatMap((sourceFile) => sitesUnder(checker)(sourceFile)),
+      Arr.filter((site) => !isInside(outers)(site.node)),
+    );
+
+const nodesOf = (sites: readonly ValueSite[]): readonly ts.Node[] =>
+  pipe(
+    sites,
+    Arr.map((site) => site.node),
+  );
 
 const analyzeProject =
   (owners: readonly Owner[]) =>
   (project: Project): ProjectAnalysis => {
     const checker = project.program.getTypeChecker();
     const ownerDeclarations = ownerDeclarationsIn(project, owners);
-    const sites = project.sourceFiles
-      .flatMap((sourceFile) => sitesUnder(checker)(sourceFile))
-      .filter((site) => !isInside(ownerDeclarations)(site.node));
+    const sites = sitesOutside(checker)(project, ownerDeclarations);
     const flowContext = { checker, program: project.program, sites };
     const context = {
       checker,
-      owners: owners.filter((owner) => isVisibleTo(project)(owner)),
+      owners: pipe(
+        owners,
+        Arr.filter((owner) => isVisibleTo(project)(owner)),
+      ),
       vocabularies: project.library.vocabularies,
-      flows: project.sourceFiles.flatMap((sourceFile) => flowsIn(flowContext)(sourceFile)),
+      flows: pipe(
+        project.sourceFiles,
+        Arr.flatMap((sourceFile) => flowsIn(flowContext)(sourceFile)),
+      ),
     };
-    const verdicts = sites.map((site) => siteVerdict(context)(site));
-    const excluded = [...ownerDeclarations, ...sites.map((site) => site.node)];
+    const verdicts = pipe(
+      sites,
+      Arr.map((site) => siteVerdict(context)(site)),
+    );
+    const excluded = [...ownerDeclarations, ...nodesOf(sites)];
+    const shapeContext = { checker, shapes: project.library.shapes };
     return {
       problems: [
-        ...verdicts.flatMap((found) => found.problems),
-        ...project.sourceFiles.flatMap((sourceFile) =>
-          ownedLiteralProblems(context)(sourceFile, excluded),
+        ...pipe(
+          verdicts,
+          Arr.flatMap((found) => found.problems),
         ),
-        ...project.sourceFiles.flatMap((sourceFile) =>
-          shapeProblemsIn({ checker, shapes: project.library.shapes })(sourceFile),
+        ...pipe(
+          project.sourceFiles,
+          Arr.flatMap((sourceFile) => [
+            ...ownedLiteralProblems(context)(sourceFile, excluded),
+            ...shapeProblemsIn(shapeContext)(sourceFile),
+          ]),
         ),
       ],
-      unowned: verdicts.flatMap((found) => found.unowned),
+      unowned: pipe(
+        verdicts,
+        Arr.flatMap((found) => found.unowned),
+      ),
     };
   };
 

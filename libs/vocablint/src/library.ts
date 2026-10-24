@@ -1,4 +1,4 @@
-import { Array as Arr, Option } from "effect";
+import { Array as Arr, Option, pipe } from "effect";
 import ts from "typescript-6";
 
 import type { DependencyEntry } from "./dependencies.ts";
@@ -105,12 +105,21 @@ const schemaValueIndex = (walk: Walk, exported: Exported): LibraryIndex => {
 };
 
 const mergeIndexes = (indexes: readonly LibraryIndex[]): LibraryIndex => ({
-  vocabularies: indexes.flatMap((index) => index.vocabularies),
-  shapes: indexes.flatMap((index) => index.shapes),
+  vocabularies: pipe(
+    indexes,
+    Arr.flatMap((index) => index.vocabularies),
+  ),
+  shapes: pipe(
+    indexes,
+    Arr.flatMap((index) => index.shapes),
+  ),
 });
 
 const isNamespace = (symbol: ts.Symbol): boolean =>
-  declarationsOf(symbol).some((declaration) => ts.isModuleDeclaration(declaration));
+  pipe(
+    declarationsOf(symbol),
+    Arr.some((declaration) => ts.isModuleDeclaration(declaration)),
+  );
 
 const indexUnder = (walk: Walk, visit: Visit): LibraryIndex => {
   const symbol = resolvedSymbol(walk.checker)(visit.exported);
@@ -123,12 +132,15 @@ const indexUnder = (walk: Walk, visit: Visit): LibraryIndex => {
   ) {
     return own;
   }
-  const nested = walk.checker.getExportsOfModule(symbol).map((member) =>
-    indexUnder(walk, {
-      exported: member,
-      qualifier: `${named.typeName}.`,
-      ancestors: [...visit.ancestors, symbol],
-    }),
+  const nested = pipe(
+    walk.checker.getExportsOfModule(symbol),
+    Arr.map((member) =>
+      indexUnder(walk, {
+        exported: member,
+        qualifier: `${named.typeName}.`,
+        ancestors: [...visit.ancestors, symbol],
+      }),
+    ),
   );
   return mergeIndexes([own, ...nested]);
 };
@@ -158,14 +170,22 @@ const indexOfEntry =
       onSome: (assigned) => [resolvedSymbol(checker)(assigned)],
     });
     return mergeIndexes(
-      roots.map((exported) => indexUnder(walk, { exported, qualifier: "", ancestors: [] })),
+      pipe(
+        roots,
+        Arr.map((exported) => indexUnder(walk, { exported, qualifier: "", ancestors: [] })),
+      ),
     );
   };
 
 const libraryIndex =
   (program: ts.Program) =>
   (entries: readonly DependencyEntry[]): LibraryIndex =>
-    mergeIndexes(entries.map((entry) => indexOfEntry(program)(entry)));
+    mergeIndexes(
+      pipe(
+        entries,
+        Arr.map((entry) => indexOfEntry(program)(entry)),
+      ),
+    );
 
 export { describeLibraryType, isObjectType, libraryIndex };
 export type { LibraryIndex, LibraryShape, LibraryType, LibraryVocabulary };

@@ -1,4 +1,4 @@
-import { Array as Arr, Function as Fn, Option } from "effect";
+import { Array as Arr, Function as Fn, Option, pipe } from "effect";
 import ts from "typescript-6";
 
 type Value = string | number;
@@ -24,9 +24,11 @@ const literalValueOf = (type: ts.Type): Option.Option<Value> => {
 };
 
 const literalValuesOf = (types: readonly ts.Type[]): Option.Option<readonly Value[]> => {
-  const values = Arr.dedupeWith(
-    Arr.getSomes(types.map((member) => literalValueOf(member))),
-    (left, right) => valueKey(left) === valueKey(right),
+  const values = pipe(
+    types,
+    Arr.map((member) => literalValueOf(member)),
+    Arr.getSomes,
+    Arr.dedupeWith((left, right) => valueKey(left) === valueKey(right)),
   );
   if (values.length !== types.length || values.length < MINIMUM_SET_SIZE) {
     return Option.none();
@@ -72,8 +74,16 @@ const vocabularyOf =
     if (!type.isUnion()) {
       return Option.none();
     }
-    const members = type.types.filter((member) => !isOptionalMember(checker, member));
-    const values = Arr.getSomes(members.map((member) => literalValueOf(member)));
+    const members = pipe(
+      type.types,
+      Arr.filter((member) => !isOptionalMember(checker, member)),
+    );
+    const values = Arr.getSomes(
+      pipe(
+        members,
+        Arr.map((member) => literalValueOf(member)),
+      ),
+    );
     if (values.length < MINIMUM_SET_SIZE) {
       return Option.none();
     }
@@ -84,8 +94,16 @@ const isSubsetOf: {
   (superset: readonly Value[]): (subset: readonly Value[]) => boolean;
   (subset: readonly Value[], superset: readonly Value[]): boolean;
 } = Fn.dual(DATA_FIRST_ARITY, (subset: readonly Value[], superset: readonly Value[]): boolean => {
-  const held = new Set(superset.map((value) => valueKey(value)));
-  return subset.every((value) => held.has(valueKey(value)));
+  const held = new Set(
+    pipe(
+      superset,
+      Arr.map((value) => valueKey(value)),
+    ),
+  );
+  return pipe(
+    subset,
+    Arr.every((value) => held.has(valueKey(value))),
+  );
 });
 
 const sameValues: {
@@ -98,7 +116,11 @@ const sameValues: {
 );
 
 const formatValues = (values: readonly Value[]): string =>
-  values.map((value) => JSON.stringify(value)).join(" | ");
+  pipe(
+    values,
+    Arr.map((value) => JSON.stringify(value)),
+    Arr.join(" | "),
+  );
 
 export {
   finiteValuesOf,

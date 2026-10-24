@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Array as Arr, pipe } from "effect";
 
 import { analyzeProject } from "./analysis.ts";
 import { duplicateProblems } from "./duplicates.ts";
@@ -12,12 +12,22 @@ const checkRepository = Effect.fn("checkRepository")(function* checkRepository(r
   const configPaths = yield* listConfigFiles(root);
   const projects = yield* loadProjects(root, configPaths);
   const ownerScan = scanOwners(projects);
-  const analyses = projects.map((project) => analyzeProject(ownerScan.owners)(project));
+  const analyses = pipe(
+    projects,
+    Arr.map((project) => analyzeProject(ownerScan.owners)(project)),
+  );
   const relative = (file: string): string => files.relative(root, file);
+  const unowned = pipe(
+    analyses,
+    Arr.flatMap((analysis) => analysis.unowned),
+  );
   return sortProblems([
     ...ownerScan.problems,
-    ...analyses.flatMap((analysis) => analysis.problems),
-    ...duplicateProblems(relative)(analyses.flatMap((analysis) => analysis.unowned)),
+    ...pipe(
+      analyses,
+      Arr.flatMap((analysis) => analysis.problems),
+    ),
+    ...duplicateProblems(relative)(unowned),
   ]);
 });
 

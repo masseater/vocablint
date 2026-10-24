@@ -1,5 +1,5 @@
 import { layer } from "@effect/vitest";
-import { Effect } from "effect";
+import { Effect, Array as Arr, String as Str, pipe } from "effect";
 import { expect } from "vite-plus/test";
 
 import { dependencyEntries } from "./dependencies.ts";
@@ -18,10 +18,13 @@ const relativeEntries = (
 ): Effect.Effect<readonly RelativeEntry[], never, RepositoryFiles> =>
   dependencyEntries(packageDirectory).pipe(
     Effect.map((entries) =>
-      entries.map((entry) => ({
-        specifier: entry.specifier,
-        declarationsPath: entry.declarationsPath.slice(`${packageDirectory}/`.length),
-      })),
+      pipe(
+        entries,
+        Arr.map((entry) => ({
+          specifier: entry.specifier,
+          declarationsPath: Str.slice(`${packageDirectory}/`.length)(entry.declarationsPath),
+        })),
+      ),
     ),
   );
 
@@ -218,11 +221,12 @@ const sortsEntriesByPackageName = Effect.gen(function* sortsEntriesByPackageName
     "node_modules/mid/package.json": manifest({ types: "./index.d.ts" }),
     "node_modules/mid/index.d.ts": EMPTY_DECLARATIONS,
   });
-  expect((yield* relativeEntries(packageDirectory)).map((entry) => entry.specifier)).toStrictEqual([
-    "alpha",
-    "mid",
-    "zod",
-  ]);
+  expect(
+    pipe(
+      yield* relativeEntries(packageDirectory),
+      Arr.map((entry) => entry.specifier),
+    ),
+  ).toStrictEqual(["alpha", "mid", "zod"]);
 });
 
 const hasNothingToOfferWithoutDependenciesOrWi = Effect.gen(

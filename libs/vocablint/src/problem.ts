@@ -1,4 +1,4 @@
-import { Array as Arr, Order, Schema } from "effect";
+import { Array as Arr, Order, Schema, pipe } from "effect";
 import type ts from "typescript-6";
 
 import { columnOf, lineOf } from "./syntax.ts";
@@ -53,7 +53,10 @@ const problemOrder: Order.Order<Problem> = Order.combineAll([
 ]);
 
 const problemKey = (problem: Problem): string =>
-  [problem.file, problem.line, problem.column, problem.rule, problem.message].join("\0");
+  pipe(
+    [problem.file, String(problem.line), String(problem.column), problem.rule, problem.message],
+    Arr.join("\0"),
+  );
 
 const sortProblems = (problems: readonly Problem[]): readonly Problem[] =>
   Arr.sort(

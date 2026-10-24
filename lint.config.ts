@@ -1,3 +1,9 @@
+import { presets as effectPresets } from "@effect/tsgo/oxlint-presets";
+import eslintReact from "@eslint-react/eslint-plugin";
+import htmlReact from "@html-eslint/eslint-plugin-react";
+import { Array as Arr, Record as Rec, String as Str, Struct, pipe } from "effect";
+import reactHooks from "eslint-plugin-react-hooks";
+
 import decisionPlugin from "./decision-rules.ts";
 
 const REACT_STATE_HOOKS: readonly string[] = [
@@ -131,22 +137,32 @@ const requiredStack: Readonly<Record<string, readonly string[]>> = {
   ],
 };
 
-const requiredStackEntries = Object.entries(requiredStack).flatMap(([message, modules]) =>
-  modules.map((module) => ({ message, module })),
+const requiredStackEntries = pipe(
+  Rec.toEntries(requiredStack),
+  Arr.flatMap(([message, modules]) =>
+    pipe(
+      modules,
+      Arr.map((module) => ({ message, module })),
+    ),
+  ),
 );
 
-const requiredStackPaths: readonly Readonly<{ name: string; message: string }>[] =
-  requiredStackEntries
-    .filter(({ module }) => !module.includes("*"))
-    .map(({ message, module }) => ({ name: module, message }));
+const requiredStackPaths: readonly Readonly<{ name: string; message: string }>[] = pipe(
+  requiredStackEntries,
+  Arr.filter(({ module }) => !Str.includes("*")(module)),
+  Arr.map(({ message, module }) => ({ name: module, message })),
+);
 
 const requiredStackPatterns: readonly Readonly<{ group: readonly string[]; message: string }>[] =
-  requiredStackEntries.map(({ message, module }) => {
-    if (module.includes("*")) {
-      return { group: [module, `${module}/**`], message };
-    }
-    return { group: [`${module}/**`], message };
-  });
+  pipe(
+    requiredStackEntries,
+    Arr.map(({ message, module }) => {
+      if (Str.includes("*")(module)) {
+        return { group: [module, `${module}/**`], message };
+      }
+      return { group: [`${module}/**`], message };
+    }),
+  );
 
 const restrictedImports = {
   paths: [
@@ -174,10 +190,69 @@ const generated = [
   "CHANGELOG.md",
 ];
 
-const decisionPluginName = decisionPlugin.meta.name;
+const asErrors = (names: readonly string[]): Readonly<Record<string, "error">> =>
+  Rec.fromEntries(
+    pipe(
+      names,
+      Arr.map((name) => [name, "error"] as const),
+    ),
+  );
 
-const decisionRuleNames = Object.keys(decisionPlugin.rules).map(
-  (id) => `${decisionPluginName}/${id}`,
+const allRulesOf = ({
+  prefix,
+  rules,
+}: Readonly<{ prefix: string; rules: Readonly<Record<string, unknown>> }>): Readonly<
+  Record<string, "error">
+> =>
+  asErrors(
+    pipe(
+      Rec.keys(rules),
+      Arr.map((rule) => `${prefix}/${rule}`),
+    ),
+  );
+
+const reactHooksRuleNames = pipe(
+  Struct.keys(reactHooks.configs["recommended-latest"].rules),
+  Arr.map(Str.replace("react-hooks/", "react-hooks-js/")),
 );
 
-export { decisionPluginName, decisionRuleNames, generated, requiredStack, restrictedImports };
+const reactHooksRules = asErrors(reactHooksRuleNames);
+
+const eslintReactRuleNames = pipe(
+  Rec.keys(eslintReact.configs["strict-typescript"].rules ?? {}),
+  Arr.filter(
+    (name) => !(Str.replace("@eslint-react/", "react-hooks-js/")(name) in reactHooksRules),
+  ),
+);
+
+const effectRuleNames = pipe(
+  Rec.values(effectPresets),
+  Arr.flatMap((preset) => Struct.keys(preset.rules ?? {})),
+);
+
+const pluginRules: Readonly<Record<string, "error">> = {
+  ...asErrors(Rec.keys(htmlReact.configs.all.rules ?? {})),
+  ...reactHooksRules,
+  ...asErrors(eslintReactRuleNames),
+  ...asErrors(effectRuleNames),
+};
+
+const decisionPluginName = decisionPlugin.meta.name;
+
+const decisionRules = allRulesOf({ prefix: decisionPluginName, rules: decisionPlugin.rules });
+
+const decisionTestRules = pipe(
+  decisionRules,
+  Rec.map(() => "off" as const),
+);
+
+export {
+  allRulesOf,
+  decisionPluginName,
+  decisionRules,
+  decisionTestRules,
+  generated,
+  pluginRules,
+  requiredStack,
+  restrictedImports,
+};

@@ -1,5 +1,6 @@
 import { POSITION_BASE, describeFinding } from "@vocablint/core";
 import type { Problem } from "@vocablint/core";
+import { Array as Arr, pipe } from "effect";
 import type { Diagnostic, Plugin, Rule } from "vite-plus/lint/plugins";
 
 type ProblemLoader = (cwd: string) => readonly Problem[];
@@ -12,7 +13,10 @@ const diagnosticOf = (problem: Problem): Diagnostic => ({
 const vocabularyRule = (load: ProblemLoader): Rule => ({
   create: (context) => ({
     Program: () => {
-      const problems = load(context.cwd).filter((problem) => problem.file === context.filename);
+      const problems = pipe(
+        load(context.cwd),
+        Arr.filter((problem) => problem.file === context.filename),
+      );
       for (const problem of problems) {
         context.report(diagnosticOf(problem));
       }

@@ -1,4 +1,4 @@
-import { Array as Arr, Option } from "effect";
+import { Array as Arr, Option, pipe } from "effect";
 import ts from "typescript-6";
 
 import type { Flow } from "./flows.ts";
@@ -37,8 +37,16 @@ const NOTHING_HIDDEN = 0;
 const directOwners =
   (context: ValueContext) =>
   (symbol: ts.Symbol): readonly Owner[] => {
-    const keys = Arr.getSomes(declarationsOf(symbol).map((declaration) => ownerKeyOf(declaration)));
-    return context.owners.filter((owner) => keys.includes(owner.key));
+    const keys = Arr.getSomes(
+      pipe(
+        declarationsOf(symbol),
+        Arr.map((declaration) => ownerKeyOf(declaration)),
+      ),
+    );
+    return pipe(
+      context.owners,
+      Arr.filter((owner) => keys.includes(owner.key)),
+    );
   };
 
 const isFollowable = (declaration: ts.Declaration): boolean =>
@@ -54,16 +62,22 @@ const ownersBehind =
     }
     const visited = [...ancestors, symbol];
     return uniqueByReference(
-      declarationsOf(symbol)
-        .filter((declaration) => isFollowable(declaration))
-        .flatMap((declaration) => referencedSymbols(context.checker)(declaration))
-        .filter((referenced) => !visited.includes(referenced))
-        .flatMap((referenced) => ownersBehind(context)(referenced, visited)),
+      pipe(
+        declarationsOf(symbol),
+        Arr.filter((declaration) => isFollowable(declaration)),
+        Arr.flatMap((declaration) => referencedSymbols(context.checker)(declaration)),
+        Arr.filter((referenced) => !visited.includes(referenced)),
+        Arr.flatMap((referenced) => ownersBehind(context)(referenced, visited)),
+      ),
     );
   };
 
 const describeOwners = (owners: readonly Owner[]): string =>
-  owners.map((owner) => `${owner.conceptId} (${owner.name})`).join(", ");
+  pipe(
+    owners,
+    Arr.map((owner) => `${owner.conceptId} (${owner.name})`),
+    Arr.join(", "),
+  );
 
 const verdict = (problems: readonly Problem[], unowned: readonly ValueSite[]): SiteVerdict => ({
   problems,
@@ -74,10 +88,19 @@ const derivedVerdict =
   (context: ValueContext) =>
   (site: ValueSite): SiteVerdict => {
     const owners = uniqueByReference(
-      site.sources.flatMap((source) => ownersBehind(context)(source, [])),
+      pipe(
+        site.sources,
+        Arr.flatMap((source) => ownersBehind(context)(source, [])),
+      ),
     );
-    const held = owners.flatMap((owner) => owner.values);
-    const added = site.values.filter((value) => !isSubsetOf([value], held));
+    const held = pipe(
+      owners,
+      Arr.flatMap((owner) => owner.values),
+    );
+    const added = pipe(
+      site.values,
+      Arr.filter((value) => !isSubsetOf([value], held)),
+    );
     if (!Arr.isReadonlyArrayNonEmpty(owners) || !Arr.isReadonlyArrayNonEmpty(added)) {
       return verdict([], []);
     }
@@ -89,23 +112,34 @@ const libraryCandidates =
   (context: ValueContext) =>
   (site: ValueSite): readonly string[] => {
     const flowing = Arr.dedupe(
-      context.flows.filter((flow) => flow.site.node === site.node).map((flow) => flow.target),
+      pipe(
+        context.flows,
+        Arr.filter((flow) => flow.site.node === site.node),
+        Arr.map((flow) => flow.target),
+      ),
     );
     if (Arr.isReadonlyArrayNonEmpty(flowing)) {
       return flowing;
     }
-    if (!site.values.some((value) => typeof value === "string")) {
+    if (
+      !pipe(
+        site.values,
+        Arr.some((value) => typeof value === "string"),
+      )
+    ) {
       return [];
     }
     return Arr.dedupe(
-      context.vocabularies
-        .filter((library) => isSubsetOf(site.values, library.vocabulary.values))
-        .map((library) => describeLibraryType(library)),
+      pipe(
+        context.vocabularies,
+        Arr.filter((library) => isSubsetOf(site.values, library.vocabulary.values)),
+        Arr.map((library) => describeLibraryType(library)),
+      ),
     );
   };
 
 const listCandidates = (candidates: readonly string[]): string => {
-  const shown = Arr.take(candidates, CANDIDATE_LIMIT).join(", ");
+  const shown = pipe(Arr.take(candidates, CANDIDATE_LIMIT), Arr.join(", "));
   const hidden = candidates.length - CANDIDATE_LIMIT;
   if (hidden > NOTHING_HIDDEN) {
     return `${shown} and ${String(hidden)} more`;
@@ -116,7 +150,10 @@ const listCandidates = (candidates: readonly string[]): string => {
 const originalVerdict =
   (context: ValueContext) =>
   (site: ValueSite): SiteVerdict => {
-    const owners = context.owners.filter((owner) => isSubsetOf(site.values, owner.values));
+    const owners = pipe(
+      context.owners,
+      Arr.filter((owner) => isSubsetOf(site.values, owner.values)),
+    );
     if (Arr.isReadonlyArrayNonEmpty(owners)) {
       const message = `The values ${formatValues(site.values)} are owned by ${describeOwners(owners)}. Derive this set from the owner instead of restating it.`;
       return verdict([problemAt({ rule: "owner-value-set", message })(site.node)], []);
@@ -161,7 +198,13 @@ const VALUE_SLOTS = [isCallArgument, isInitializer, isRightOperand];
 
 const isValuePosition = (node: ts.Node): boolean => {
   const { parent } = node;
-  return VALUE_PARENT_KINDS.has(parent.kind) || VALUE_SLOTS.some((isSlot) => isSlot(node, parent));
+  return (
+    VALUE_PARENT_KINDS.has(parent.kind) ||
+    pipe(
+      VALUE_SLOTS,
+      Arr.some((isSlot) => isSlot(node, parent)),
+    )
+  );
 };
 
 const ownedLiteralProblem =
@@ -174,11 +217,12 @@ const ownedLiteralProblem =
         ),
       ),
       Option.map(() =>
-        uniqueByReference(
-          contextSymbolsOf(context.checker)(literal).flatMap((symbol) =>
-            ownersBehind(context)(symbol, []),
-          ),
-        ).filter((owner) => isSubsetOf([literal.text], owner.values.map(String))),
+        pipe(
+          contextSymbolsOf(context.checker)(literal),
+          Arr.flatMap((symbol) => ownersBehind(context)(symbol, [])),
+          uniqueByReference,
+          Arr.filter((owner) => isSubsetOf([literal.text], pipe(owner.values, Arr.map(String)))),
+        ),
       ),
       Option.filter((owners) => Arr.isReadonlyArrayNonEmpty(owners)),
       Option.map((owners) =>
@@ -193,11 +237,19 @@ const ownedLiteralProblems =
   (context: ValueContext) =>
   (sourceFile: ts.SourceFile, excluded: readonly ts.Node[]): readonly Problem[] =>
     Arr.getSomes(
-      descendantsOf(sourceFile)
-        .filter((node) => ts.isStringLiteral(node) || ts.isNumericLiteral(node))
-        .filter((node) => isValuePosition(node))
-        .filter((node) => !excluded.some((outer) => contains(outer)(node)))
-        .map((node) => ownedLiteralProblem(context)(node)),
+      pipe(
+        descendantsOf(sourceFile),
+        Arr.filter((node) => ts.isStringLiteral(node) || ts.isNumericLiteral(node)),
+        Arr.filter((node) => isValuePosition(node)),
+        Arr.filter(
+          (node) =>
+            !pipe(
+              excluded,
+              Arr.some((outer) => contains(outer)(node)),
+            ),
+        ),
+        Arr.map((node) => ownedLiteralProblem(context)(node)),
+      ),
     );
 
 export { ownedLiteralProblems, siteVerdict };
