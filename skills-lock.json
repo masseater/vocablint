@@ -255,7 +255,7 @@
     },
     "systematic-debugging": {
       "source": "obra/superpowers",
-      "ref": "bb92a77741419a4ab5f06e711a283343f1ada0c3",
+      "ref": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
       "sourceType": "github",
       "skillPath": "skills/systematic-debugging/SKILL.md",
       "computedHash": "276fb0aadb002ab930cc2a56de89e16995a2e3e70b33587652bf0a5fb123148d"
@@ -290,7 +290,7 @@
     },
     "verification-before-completion": {
       "source": "obra/superpowers",
-      "ref": "bb92a77741419a4ab5f06e711a283343f1ada0c3",
+      "ref": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
       "sourceType": "github",
       "skillPath": "skills/verification-before-completion/SKILL.md",
       "computedHash": "b529822bdac4b197b180fe12225cff86b930b65910435103c10622df7f041651"
