@@ -94,7 +94,7 @@
     },
     "elysiajs": {
       "source": "elysiajs/skills",
-      "ref": "8fd8031b83bce42e903ed0e38e6170213876c20e",
+      "ref": "1466d85aa4f2a0fec91f71311e65bbfa91aa7dc5",
       "sourceType": "github",
       "skillPath": "elysia/SKILL.md",
       "computedHash": "55268e69a2c766ed67e56a0db57544f60cc52dba0c7f024a974baf965e525e1b"
