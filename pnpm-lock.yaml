@@ -201,8 +201,8 @@ catalogs:
       specifier: 0.1.0
       version: 0.1.0
     '@tanstack/intent':
-      specifier: 0.5.5
-      version: 0.5.5
+      specifier: 0.5.6
+      version: 0.5.6
     '@types/node':
       specifier: 26.6.5
       version: 26.6.5
@@ -332,7 +332,7 @@ importers:
         version: 0.1.0(patch_hash=364cc40b73326fe59c5d685ac247690de2302e3e731b7b7d37583701f9370644)(eslint@10.12.0(jiti@2.6.1)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
       '@tanstack/intent':
         specifier: 'catalog:'
-        version: 0.5.5
+        version: 0.5.6
       '@textlint-ja/textlint-rule-preset-ai-writing':
         specifier: 1.7.0
         version: 1.7.0
@@ -2965,8 +2965,8 @@ packages:
       eslint: ^8.57.0 || ^9.0.0
       typescript: '>=4.7.0'
 
-  '@tanstack/intent@0.5.5':
-    resolution: {integrity: sha512-Ei5RqUWgV96HrezTEyDbScy0wZN+17dNo59Am8/3ncv0YIaIxApkiX5LkM488wxe4a1Imdi09nhjFxblxwLMSQ==}
+  '@tanstack/intent@0.5.6':
+    resolution: {integrity: sha512-9Ta/GMGPcqBIqlbrqeYyqBVKEP7XyAXy6nn90bPiE2oHB6KPgjEweUbHNXLQ6Pim01VtMMNf0dmUFMGKKHXmlw==}
     engines: {node: '>=20.12.0'}
     hasBin: true
 
@@ -9548,7 +9548,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@tanstack/intent@0.5.5': {}
+  '@tanstack/intent@0.5.6': {}
 
   '@testing-library/dom@10.4.2':
     dependencies:

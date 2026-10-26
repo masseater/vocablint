@@ -29,7 +29,7 @@ catalog:
   "@commitlint/cli": 21.2.4
   "@commitlint/config-conventional": 21.2.4
   skills: 1.7.2
-  "@tanstack/intent": 0.5.5
+  "@tanstack/intent": 0.5.6
   "@yarnpkg/parsers": 3.1.0
   vitest: 5.0.5
   "@effect/vitest": 4.0.2
