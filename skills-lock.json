@@ -3,14 +3,14 @@
   "skills": {
     "analytics": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/analytics/SKILL.md",
       "computedHash": "a4f9c13c7065897689cb88ec09af9a4c0ab6f5b7e6f88e110da7b6a190360365"
     },
     "api-design": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/api-design/SKILL.md",
       "computedHash": "76d8bca6f774aa2ad7289df627af23f70d254d2957bdae5ba2bd7891df12b071"
@@ -38,49 +38,49 @@
     },
     "commit-and-git": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/commit-and-git/SKILL.md",
       "computedHash": "11caf5eb985126d763e10a57905348944f6b31f0bfe87a63f81c556795bae87c"
     },
     "conventions": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/conventions/SKILL.md",
       "computedHash": "c13fac7b91a4e1fc09331edee1a93199d42173fae73004d3ebd9ecff8f96f286"
     },
     "cursor-hook-authoring": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/cursor-hook-authoring/SKILL.md",
       "computedHash": "c6ab9e242b4312b65cfdcda1d02643e60dfc00525a2b721ad536aaa70650575a"
     },
     "data-migration": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/data-migration/SKILL.md",
       "computedHash": "7b45cdc0a8d835ff9a60833314e28e59205d16f69f4ed5c0df24e0d6ffe353dd"
     },
     "db": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/db/SKILL.md",
       "computedHash": "21dcfd2b10cce02af0fad81a4004e74686e958b98ddeb442bdc27e1fc164048c"
     },
     "e2e-testing": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/e2e-testing/SKILL.md",
       "computedHash": "78a50855e590d668bfd5ee8fcf03c5259f8f3b8eca9a8a5d45bc06c13fbd342f"
     },
     "e2etest": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/e2etest/SKILL.md",
       "computedHash": "f763bee80819e72cffa9586410fade529f69974c8f5e63af71be7dc2937871c1"
@@ -108,7 +108,7 @@
     },
     "errorpage": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/errorpage/SKILL.md",
       "computedHash": "98717e9815539717d1783c0d4b3e37ec551702ff509159e03866521dc23feb42"
@@ -122,21 +122,21 @@
     },
     "github": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/github/SKILL.md",
       "computedHash": "816441752fa757845922ce39006e1644855ffc7fe321d19460cfa224b0227ccf"
     },
     "google-analytics": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/google-analytics/SKILL.md",
       "computedHash": "6c01fe19ff57fc6acefbab85cc6bbff898f50afcb217bacedd38f47d605a4133"
     },
     "hono": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/hono/SKILL.md",
       "computedHash": "5bbd7991532628874467abe71cbe4cb4651d6f5566e24524859ca320119a715d"
@@ -157,35 +157,35 @@
     },
     "issue-branch-pr-flow": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/issue-branch-pr-flow/SKILL.md",
       "computedHash": "fa600c32421c9fd162e1c3a777dc598d2ba916bbc6f3157e85f4f37cf1ffc495"
     },
     "japanese": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/japanese/SKILL.md",
       "computedHash": "83f6d19b871b6adf6e758608ef2646e6a5d69a096982e0f3485b260ec7d0ae34"
     },
     "japanese-writing": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/japanese-writing/SKILL.md",
       "computedHash": "60d2bc7a3eebbaac7eabb000e86829df2d2ce94a7ceebe6c109a6f469cb7aa14"
     },
     "knowledge-elicitation": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/knowledge-elicitation/SKILL.md",
       "computedHash": "b6b0a8fbb293f66b0ed58b5070b0995b4b395879556add65190b2539e394abe6"
     },
     "m4l-project": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/m4l-project/SKILL.md",
       "computedHash": "7e1aee96370e3dc0abccdeb632aeee52061e437c2c25c71576c0500dcaeb118e"
@@ -206,7 +206,7 @@
     },
     "refresh-skills": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/refresh-skills/SKILL.md",
       "computedHash": "ee96e0a9fe6f55c69609c0fc40866276949fc2db2de3666c5cf954213e68d573"
@@ -234,14 +234,14 @@
     },
     "skill-escalation": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/skill-escalation/SKILL.md",
       "computedHash": "d84c3de6683f44bdd08790cfe744f1f6e3367507ee419f18aebba709dad1b869"
     },
     "skill-selection": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/skill-selection/SKILL.md",
       "computedHash": "c42755e5c8d18e4d3b4a4c8470b3b12a27508bb3921dec40ed10a2b541ea90d9"
@@ -262,7 +262,7 @@
     },
     "turborepo": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/turborepo/SKILL.md",
       "computedHash": "435222ca43b3b7683e64fd7ddaa8d7f806be899c13f8b1fc9b55a5848c6ea4c1"
@@ -276,7 +276,7 @@
     },
     "typescript-monorepo": {
       "source": "philtzjp/skills",
-      "ref": "5d8b844e8cf087515a345b56bf5b40ad8125f4bc",
+      "ref": "acbcf941cae90b101dfb83598e3322504eeda64f",
       "sourceType": "github",
       "skillPath": ".agents/skills/typescript-monorepo/SKILL.md",
       "computedHash": "f19c8cd7b2cc5b037f68cae38cadabf64cada2aefc4a9b1ff374b7b262df2fb0"
