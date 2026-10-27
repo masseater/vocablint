@@ -199,7 +199,7 @@
     },
     "modern-web-guidance": {
       "source": "GoogleChrome/modern-web-guidance",
-      "ref": "65e7edd67e77420eaf02c5df00fdc0521417d809",
+      "ref": "4f2b13e25c5815b3f080ca0d983e828d96561a0f",
       "sourceType": "github",
       "skillPath": "skills/modern-web-guidance/SKILL.md",
       "computedHash": "813274e05233f139ad0bc5f67ce7c4c524b4c81c672f9ff7905957b3a09b46b4"
