@@ -183,8 +183,8 @@ catalogs:
       specifier: 0.7.0
       version: 0.7.0
     '@html-eslint/eslint-plugin-react':
-      specifier: 0.66.1
-      version: 0.66.1
+      specifier: 0.67.0
+      version: 0.67.0
     '@r_masseater/oxlint-plugin-decision':
       specifier: 0.0.4
       version: 0.0.4
@@ -314,7 +314,7 @@ importers:
         version: 0.7.0
       '@html-eslint/eslint-plugin-react':
         specifier: 'catalog:'
-        version: 0.66.1(eslint@10.12.0(jiti@2.6.1)(supports-color@7.2.0))
+        version: 0.67.0(eslint@10.12.0(jiti@2.6.1)(supports-color@7.2.0))
       '@r_masseater/oxlint-plugin-decision':
         specifier: 'catalog:'
         version: 0.0.4(oxlint@1.88.0(oxlint-tsgolint@7.0.2004)(vite-plus@1.3.0(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@vitest/ui@5.0.5)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@6.0.3)(yaml@2.9.1)))(redis@6.2.1(@opentelemetry/api@1.9.1))
@@ -1566,18 +1566,18 @@ packages:
     peerDependencies:
       hono: ^4.13.7
 
-  '@html-eslint/core@0.66.1':
-    resolution: {integrity: sha512-Rxog7sJUrBQsDObqrsSyuJNggLx5nqLKpx47/OIkut1qTpjWLUmtarcKTHjfNXidX2g5Hq7mr7rhrQJIglNhHg==}
+  '@html-eslint/core@0.67.0':
+    resolution: {integrity: sha512-MPoKw4woCkuFYs2xdt0vEjzGbUzU8lxeTZkxyrtHM+zZlaK/u/lqcIapZmyCTQBqNE0H9J8zc9TmXjygfHcuXg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@html-eslint/eslint-plugin-react@0.66.1':
-    resolution: {integrity: sha512-gSodB0JPanToSedEwrIcT7qvH1LxqbUsLsT5XfrlLCkt1G4k/+2j274wbqqul/IMym2q1jiYiDlzTjtWxkisKA==}
+  '@html-eslint/eslint-plugin-react@0.67.0':
+    resolution: {integrity: sha512-YqrkBMUdvwLNeLYYoITZToYjqSVbNHENy3gAXx4SHy03YB3W/z9yBInYAAdwcQxI6aHZLz0LYZ0LYEb1XnCRjw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: '>=8.0.0 || ^10.0.0-0'
 
-  '@html-eslint/types@0.66.1':
-    resolution: {integrity: sha512-wX7v093qlQYzuPHSD4a0C1P2F6HM1PhEq6vYxj9L2LoT9VoIbVPJ2KKcGBgNGHwvVhwbOh0EY+R8+TcaJGVXTQ==}
+  '@html-eslint/types@0.67.0':
+    resolution: {integrity: sha512-8w9V0sTm2DGLh2uslL7+Un9g/FHNcevgouiTLhlAJoBhhGOK5+fX76QCKdWbgmpudNGo8Nh1kHKsJP3a6twzXA==}
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -8417,17 +8417,17 @@ snapshots:
     dependencies:
       hono: 4.13.13
 
-  '@html-eslint/core@0.66.1':
+  '@html-eslint/core@0.67.0':
     dependencies:
-      '@html-eslint/types': 0.66.1
+      '@html-eslint/types': 0.67.0
       html-standard: 0.0.13
 
-  '@html-eslint/eslint-plugin-react@0.66.1(eslint@10.12.0(jiti@2.6.1)(supports-color@7.2.0))':
+  '@html-eslint/eslint-plugin-react@0.67.0(eslint@10.12.0(jiti@2.6.1)(supports-color@7.2.0))':
     dependencies:
-      '@html-eslint/core': 0.66.1
+      '@html-eslint/core': 0.67.0
       eslint: 10.12.0(jiti@2.6.1)(supports-color@7.2.0)
 
-  '@html-eslint/types@0.66.1':
+  '@html-eslint/types@0.67.0':
     dependencies:
       '@types/css-tree': 2.3.11
       '@types/estree': 1.0.9
