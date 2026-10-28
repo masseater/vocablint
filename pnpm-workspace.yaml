@@ -15,7 +15,7 @@ catalog:
   "@tanstack/eslint-plugin-query": 5.104.5
   "@tanstack/eslint-plugin-router": 1.162.0
   "@tanstack/eslint-plugin-start": 0.1.0
-  "@typescript-eslint/parser": 8.71.1
+  "@typescript-eslint/parser": 8.72.0
   "@types/node": 26.6.5
   eslint: 10.13.0
   eslint-plugin-drizzle: 0.2.3
