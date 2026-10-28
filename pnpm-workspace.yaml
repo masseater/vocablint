@@ -40,7 +40,7 @@ catalogs:
     "@effect/tsgo": 0.56.1
     alchemy: 2.0.0-beta.83
     effect: 4.0.2
-    fallow: 3.34.1
+    fallow: 3.36.0
     renovate: 44.148.6
     textlint: 15.8.0
     typescript: 7.0.2
