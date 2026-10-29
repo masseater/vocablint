@@ -31,7 +31,7 @@
     },
     "cloudflare": {
       "source": "cloudflare/skills",
-      "ref": "86505e44f87d801aa1864a3c4109e9a8ae5c409f",
+      "ref": "49a31e0b3229ccdffe4944be9c61bc7481d1d432",
       "sourceType": "github",
       "skillPath": "skills/cloudflare/SKILL.md",
       "computedHash": "51522c6fbd95a2eaa9631a7651ba3ef434fcc92d9573c64eb28ef723290b6099"
@@ -297,7 +297,7 @@
     },
     "workers-best-practices": {
       "source": "cloudflare/skills",
-      "ref": "86505e44f87d801aa1864a3c4109e9a8ae5c409f",
+      "ref": "49a31e0b3229ccdffe4944be9c61bc7481d1d432",
       "sourceType": "github",
       "skillPath": "skills/workers-best-practices/SKILL.md",
       "computedHash": "e12970301753ed7eaa5ca375d4b98e0e36c9554e8f2809cb4b543c2ea7d9b4b8"
