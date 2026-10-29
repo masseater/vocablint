@@ -8,7 +8,7 @@ packages:
 catalogMode: prefer
 
 catalog:
-  "@ast-grep/cli": 0.50.0
+  "@ast-grep/cli": 0.51.0
   "@effect/platform-node": 4.0.2
   "@eslint-react/eslint-plugin": 5.28.8
   "@shadcn/lint": 0.2.3
