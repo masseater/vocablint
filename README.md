@@ -16,7 +16,7 @@ vocablint is not on npm yet. Build it from this repository as shown below.
 
 ## Build it
 
-You need Node.js 22 or later and [Vite+](https://viteplus.dev/guide/) (`vp`).
+You need Node.js 26 or later and [Vite+](https://viteplus.dev/guide/) (`vp`).
 
 ```sh
 git clone https://github.com/masseater/vocablint.git
