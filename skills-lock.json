@@ -34,7 +34,7 @@
       "ref": "49a31e0b3229ccdffe4944be9c61bc7481d1d432",
       "sourceType": "github",
       "skillPath": "skills/cloudflare/SKILL.md",
-      "computedHash": "51522c6fbd95a2eaa9631a7651ba3ef434fcc92d9573c64eb28ef723290b6099"
+      "computedHash": "7702c9b9e9cd742b0600735519a95e10ff09d31f4e8b1191624a271a3a507095"
     },
     "commit-and-git": {
       "source": "philtzjp/skills",
@@ -48,7 +48,7 @@
       "ref": "1d04a001f2828883fed2094497e5a58555d63f0a",
       "sourceType": "github",
       "skillPath": ".agents/skills/conventions/SKILL.md",
-      "computedHash": "c13fac7b91a4e1fc09331edee1a93199d42173fae73004d3ebd9ecff8f96f286"
+      "computedHash": "1f4363f77d77e3086ab54ae5edb2da8a86b6567ec2107d9d0758eddf5dfd5b12"
     },
     "cursor-hook-authoring": {
       "source": "philtzjp/skills",
@@ -97,7 +97,7 @@
       "ref": "1466d85aa4f2a0fec91f71311e65bbfa91aa7dc5",
       "sourceType": "github",
       "skillPath": "elysia/SKILL.md",
-      "computedHash": "55268e69a2c766ed67e56a0db57544f60cc52dba0c7f024a974baf965e525e1b"
+      "computedHash": "e0bc0ecce6cecc34f14cf445c72f7df0cec278e64dfd4ea99f26c503e98624d6"
     },
     "email-and-password-best-practices": {
       "source": "better-auth/skills",
@@ -146,14 +146,14 @@
       "ref": "ee98dea08a5a24dc527597b0567d6808926437ca",
       "sourceType": "github",
       "skillPath": "skills/how-to-use-react/SKILL.md",
-      "computedHash": "20d34daf5ebe6ec894d1fe77f2e22a0feb48ca5868d3d7e34b69864f1e5f1400"
+      "computedHash": "780d66e765c50278e8eef6786b7be55d2382b0e4a30c3fe109c9ac1f54360ec1"
     },
     "integrate": {
       "source": "masseater/skills",
       "ref": "ee98dea08a5a24dc527597b0567d6808926437ca",
       "sourceType": "github",
       "skillPath": "skills/integrate/SKILL.md",
-      "computedHash": "1f5780111b975a95c82d2856cd21ddeae4a88a1da518837d42012114d932bf70"
+      "computedHash": "09964308929f006e16387f9e685218477758273304d120625b419b13b6e0b6ee"
     },
     "issue-branch-pr-flow": {
       "source": "philtzjp/skills",
@@ -167,7 +167,7 @@
       "ref": "1d04a001f2828883fed2094497e5a58555d63f0a",
       "sourceType": "github",
       "skillPath": ".agents/skills/japanese/SKILL.md",
-      "computedHash": "83f6d19b871b6adf6e758608ef2646e6a5d69a096982e0f3485b260ec7d0ae34"
+      "computedHash": "a999c7e4114ee249ce9b121f7746ebfd1412c49cb8dda9b18512826e2d0e3fc8"
     },
     "japanese-writing": {
       "source": "philtzjp/skills",
@@ -195,14 +195,14 @@
       "ref": "ee98dea08a5a24dc527597b0567d6808926437ca",
       "sourceType": "github",
       "skillPath": "skills/measure-dont-guess/SKILL.md",
-      "computedHash": "c49f32ddadde337b7bc16dcd485ed249cda767d67fe63377ce08839ef6db94ec"
+      "computedHash": "d11db14de46d4f650f9f434f57c7078120f63ea5f1409d6718bb176b406405c5"
     },
     "modern-web-guidance": {
       "source": "GoogleChrome/modern-web-guidance",
       "ref": "4f2b13e25c5815b3f080ca0d983e828d96561a0f",
       "sourceType": "github",
       "skillPath": "skills/modern-web-guidance/SKILL.md",
-      "computedHash": "813274e05233f139ad0bc5f67ce7c4c524b4c81c672f9ff7905957b3a09b46b4"
+      "computedHash": "8e91867cc20dda14251c78c8d905847314c8c196557e1181d586a456cddcb5dc"
     },
     "refresh-skills": {
       "source": "philtzjp/skills",
@@ -216,21 +216,21 @@
       "ref": "ee98dea08a5a24dc527597b0567d6808926437ca",
       "sourceType": "github",
       "skillPath": "skills/setup-template/SKILL.md",
-      "computedHash": "95f87aba2b6e87402d2e4933983605ba9eb973b98b9112f0c55425ad19dd28c8"
+      "computedHash": "cb50b3dc81130cdf054f9e6b34e56e77e1bd1546176e90ac513288886f989fca"
     },
     "shadcn": {
       "source": "shadcn-ui/ui",
       "ref": "96da9cc7f1aa10580a3741664e2a77c721206c00",
       "sourceType": "github",
       "skillPath": "skills/shadcn/SKILL.md",
-      "computedHash": "da388f632cd83783c02967446e21941c9ee8291ccb43ba74c23f7d4e9b7c298c"
+      "computedHash": "b864a958765563321f485a96f4d59c0bb6539f4286ab6d8b8b66895b7ebd302d"
     },
     "skill-authoring": {
       "source": "masseater/skills",
       "ref": "ee98dea08a5a24dc527597b0567d6808926437ca",
       "sourceType": "github",
       "skillPath": "skills/skill-authoring/SKILL.md",
-      "computedHash": "df95cc1e67fb95b86ba4348495ca7a4db81296e397460604b764bf3e9afe963b"
+      "computedHash": "2cd8f7be50c5b9123389068074e01d72f1440af920c5ec77c1d6f5d93ffe7667"
     },
     "skill-escalation": {
       "source": "philtzjp/skills",
@@ -300,14 +300,14 @@
       "ref": "49a31e0b3229ccdffe4944be9c61bc7481d1d432",
       "sourceType": "github",
       "skillPath": "skills/workers-best-practices/SKILL.md",
-      "computedHash": "e12970301753ed7eaa5ca375d4b98e0e36c9554e8f2809cb4b543c2ea7d9b4b8"
+      "computedHash": "b6252e1aa7c41d1fbec7f064684deb9bd79866c2b6f3e18deee6d7a0c673f3f3"
     },
     "yomiyasu": {
       "source": "nanaism/yomiyasu",
       "ref": "41e5aec228f080fe24e5f795efee2ac3fda61839",
       "sourceType": "github",
       "skillPath": "skills/yomiyasu/SKILL.md",
-      "computedHash": "f45a6586b47b539db151b18cab28687cc6541650b07e577976211a87919086c7"
+      "computedHash": "d339749e69e67a3979a902a1ffb481f93492bf1ab9375557e26fbf7102af9463"
     }
   }
 }

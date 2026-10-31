@@ -7,6 +7,7 @@
     "fallow": "fallow --skip dupes --fail-on-issues --quiet --format compact && fallow dupes --fail-on-issues --quiet --format compact && fallow security --fail-on-issues --quiet"
   },
   "dependencies": {
+    "@alchemy.run/cloudflare": "catalog:stack",
     "@distilled.cloud/cloudflare": "catalog:stack",
     "@effect/platform-node": "catalog:",
     "@yarnpkg/parsers": "catalog:",
