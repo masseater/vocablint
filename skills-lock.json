@@ -204,19 +204,19 @@
       "skillPath": "skills/modern-web-guidance/SKILL.md",
       "computedHash": "8e91867cc20dda14251c78c8d905847314c8c196557e1181d586a456cddcb5dc"
     },
+    "project-checklist": {
+      "source": "masseater/skills",
+      "ref": "0d9fc5e4f12147c7b2955c1a7b480e0c602ef865",
+      "sourceType": "github",
+      "skillPath": "skills/project-checklist/SKILL.md",
+      "computedHash": "16b31583521b66890ddad0060ecb47056475660eff97c3662fb292302e8b4130"
+    },
     "refresh-skills": {
       "source": "philtzjp/skills",
       "ref": "1d04a001f2828883fed2094497e5a58555d63f0a",
       "sourceType": "github",
       "skillPath": ".agents/skills/refresh-skills/SKILL.md",
       "computedHash": "ee96e0a9fe6f55c69609c0fc40866276949fc2db2de3666c5cf954213e68d573"
-    },
-    "setup-template": {
-      "source": "masseater/skills",
-      "ref": "ee98dea08a5a24dc527597b0567d6808926437ca",
-      "sourceType": "github",
-      "skillPath": "skills/setup-template/SKILL.md",
-      "computedHash": "cb50b3dc81130cdf054f9e6b34e56e77e1bd1546176e90ac513288886f989fca"
     },
     "shadcn": {
       "source": "shadcn-ui/ui",
